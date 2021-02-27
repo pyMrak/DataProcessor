@@ -72,6 +72,9 @@ class Parameters(object):
     def __str__(self):
         return str(self.df)
 
+    def setGrpName(self, name):
+        self.groupName = name
+
     def setFunctionFile(self, functionFile):
         self.functionFile = functionFile
         self._pfg.load(self.functionFile)
@@ -86,6 +89,12 @@ class Parameters(object):
         parDict = self._pfg.get(data, grpName=self.groupName)
         if parDict is not None:
             self.defineFromDict(parDict)
+
+    def areDefined(self):
+        if self.df is not None:
+            return True
+        else:
+            return False
 
 class Parameter(object):
 
@@ -145,7 +154,7 @@ class Parameter(object):
 
 class DataGroup(object):
     
-    def __init__(self, groupDir, GUIobj=None):
+    def __init__(self, groupDir=None, GUIobj=None):
         self.groupDir = groupDir
         # if GUI object is not given (user sets language) use english Text object
         if GUIobj is None:
@@ -178,6 +187,10 @@ class DataGroup(object):
 
     def __iter__(self):
         return self._data.__iter__()
+
+    def setFolder(self, folder):
+        self.groupDir = folder
+        self._parameters.setGrpName(folder)
         
     def dirExists(self):
         return Paths.isdir(self.groupDir)
@@ -224,6 +237,12 @@ class DataGroup(object):
 
     def getFileName(self, idx):
         return list(self._data.keys())[idx]
+
+    def isDefined(self):
+        return len(self._data) > 0
+
+    def parametersDefined(self):
+        return self._parameters.areDefinded()
 
             
     
