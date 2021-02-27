@@ -171,6 +171,8 @@ class DataGroup(object):
             return self._data
         elif key == 'parameters':
             return self._parameters
+        elif type(key) == int:
+            return self.__getitem__(list(self._data.keys())[key])
         else:
             raise KeyError(key)
 
@@ -220,6 +222,9 @@ class DataGroup(object):
         if parameter in self._units:
             return self._units[parameter]
 
+    def getFileName(self, idx):
+        return list(self._data.keys())[idx]
+
             
     
         
@@ -229,4 +234,5 @@ if __name__ == "__main__":
     pdg = DataGroup(Paths.testDir)
     pdg.readPyro('functionalLab')
     pdg.getParameters('5011-721-414-QC')
-    print(pdg['parameters'])
+    for d in pdg[0]:
+        print('line:', d)

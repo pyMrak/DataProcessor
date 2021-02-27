@@ -30,6 +30,9 @@ globalParFun = parameterFunctions + globalDir
 headers = dataProcessorDir + 'Headers/'
 globalHeaders = headers + globalDir
 
+graphs = dataProcessorDir + 'Graphs/'
+globalGraphs = graphs + globalDir
+
 testDir = dataProcessorDir + 'DPtest/'
 
 
@@ -68,6 +71,16 @@ def getUserHdrFile(username, file):
 
 def getGlobalHdrFile(file):
     return globalHeaders + file + '.hdr'
+
+def getUserGraphFold(username):
+    return graphs + username + '/'
+
+def getUserGraphFile(username, file):
+    return getUserGraphFold(username) + file + '.grf'
+
+
+def getGlobalGraphFile(file):
+    return globalGraphs + file + '.grf'
 
 
 def atof(text):

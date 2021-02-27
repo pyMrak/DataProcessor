@@ -7,4 +7,6 @@
 "undfHdrFeatUnt": "Feature '{0}' in header file '{1}' has no unit defined.",
 "idxAtInv": "Feature '{1}' does not exist in file '{3}' at index where feature '{0}' is equal to {2}.",
 "valNotReached": "Feature '{0}' in file '{2}' does not reach value {1}.",
-"valNotSet": "Target value for feature '{0}' not set in parameter '{1}'."}
+"valNotSet": "Target value for feature '{0}' not set in parameter '{1}'.",
+"graphColEmpty": "Graph color list in graph setting '{0}' is empty.",
+"graphColNotSet": "Graph color list in graph setting '{0}' is not set."}

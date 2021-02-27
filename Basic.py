@@ -9,8 +9,8 @@ import Paths
 
 
 
-  
-        
+
+
 # loads json file
 def loadJsonFile(fileName, textObj=None):
     with open(fileName) as jsonFile:
@@ -64,3 +64,7 @@ def loadUserParFunFile(functionFile, textObj=None):
 def loadUserHdrFile(headerFile, textObj=None):
     return loadServerFile(headerFile, Paths.getUserHdrFile, Paths.getGlobalHdrFile,
                           'hdrFileNotExists', textObj)
+
+def loadUserGraphFile(graphFile, GUIobj=None):
+    return loadServerFile(graphFile, Paths.getUserGraphFile, Paths.getGlobalGraphFile,
+                          'hdrFileNotExists', GUIobj)
