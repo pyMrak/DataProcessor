@@ -167,8 +167,8 @@ class DataGroup(object):
     def __init__(self, groupDir=None, GUIobj=None):
         self.groupDir = groupDir
         # if GUI object is not given (user sets language) use english Text object
-        if GUIobj is None:
-            self.GUIobj = Texts.getTextObj(GUIobj)
+        self.GUIobj = Texts.getTextObj(GUIobj)
+
         self._data = {}
         self._units = {}
         self._parameters = Parameters(self.groupDir, self.GUIobj)

@@ -52,37 +52,13 @@ class GUIfunObj(object):
         if error is not None:
             self.storeWarning(error)
 
-    def initializeProgessBar(self):
+    def resetProgessBar(self):
         if self.progressBar is not None:
             self.progressBar.setValue(0)
 
     def setProgressBar(self, progressBar):
         self.progressBar = progressBar
 
-
-
-
-    def setProgress(self, progress):
-        if self.progressBar is not None:
-            self.currProgress = progress
-            if self.currProgress < self.progGoal:
-                progress = int((progress / self.progGoal) * 100)
-            else:
-                self.currProgress = self.progGoal
-                progress = 100
-            self.progressBar.setValue(progress)
-
-    def progressNext(self):
-        if self.progressBar is not None:
-            self.currProgress += 1
-            if self.currProgress <= self.progGoal:
-                progress = int((self.currProgress / self.progGoal) * 100)
-                self.progressBar.setValue(progress)
-
-    def progressEnd(self):
-        self.progressBar.setValue(100)
-        self.currProgress = self.progGoal
-        #self.progressBar = None  # TODO add to avoid bugs
 
     def getProgressBar(self, iterable):
         class ProgressBar:
