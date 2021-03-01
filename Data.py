@@ -180,7 +180,6 @@ class DataGroup(object):
         return self._data
 
     def __setitem__(self, key, value):
-        print(key, value)
         self._data[key] = value
 
     def __getitem__(self, key):
@@ -212,8 +211,9 @@ class DataGroup(object):
         return Paths.listdir(self.groupDir)
     
     def readPyro(self, headerFile=None):
-        if self.dirExists():  # if directory exists 
-            for file in self.listDir():  # iterate trough its content
+        if self.dirExists():  # if directory exists
+            fileList = self.listDir()
+            for file in self.GUIobj.getProgressBar(fileList):  # iterate trough its content
                 out = IO.readPyroFile(self.groupDir, file, self.GUIobj)  # try to read every item in the directory
                 if out is not None:  # if file as been read 
                     fileName = Basic.removeExt(file)  # get file name without extension

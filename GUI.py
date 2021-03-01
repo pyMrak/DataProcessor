@@ -14,6 +14,9 @@ class GUIfunObj(object):
         self.error = None
         self.warnings = []
         self.text = Text()
+        self.progGoal = 100
+        self.currProgress = 0
+        self.progressBar = None
         
     def setLan(self, lan):
         self.text.setLan(lan)
@@ -49,4 +52,57 @@ class GUIfunObj(object):
         if error is not None:
             self.storeWarning(error)
 
-            
+    def initializeProgessBar(self):
+        if self.progressBar is not None:
+            self.progressBar.setValue(0)
+
+    def setProgressBar(self, progressBar):
+        self.progressBar = progressBar
+
+
+
+
+    def setProgress(self, progress):
+        if self.progressBar is not None:
+            self.currProgress = progress
+            if self.currProgress < self.progGoal:
+                progress = int((progress / self.progGoal) * 100)
+            else:
+                self.currProgress = self.progGoal
+                progress = 100
+            self.progressBar.setValue(progress)
+
+    def progressNext(self):
+        if self.progressBar is not None:
+            self.currProgress += 1
+            if self.currProgress <= self.progGoal:
+                progress = int((self.currProgress / self.progGoal) * 100)
+                self.progressBar.setValue(progress)
+
+    def progressEnd(self):
+        self.progressBar.setValue(100)
+        self.currProgress = self.progGoal
+        #self.progressBar = None  # TODO add to avoid bugs
+
+    def getProgressBar(self, iterable):
+        class ProgressBar:
+            def __init__(self, iterable, progressBar):
+                self.iterable = iterable
+                self.progressBar = progressBar
+
+            def __iter__(self):
+                class ProgressIterator:
+                    def __init__(self, iterator, progressBar):
+                        self.currProgress = 0
+                        self.progressBar = progressBar
+                        self.progGoal = len(iterator)
+                        self.iterator = iterator.__iter__()
+
+                    def __next__(self):
+                        self.currProgress += 1
+                        if self.progressBar is not None:
+                            progress = int((self.currProgress / self.progGoal) * 100)
+                            self.progressBar.setValue(progress)
+                        return self.iterator.__next__()
+                return ProgressIterator(self.iterable, self.progressBar)
+        return ProgressBar(iterable, self.progressBar)
