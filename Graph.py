@@ -20,7 +20,6 @@ class MatplotlibObject():
         self.ax.grid(True)
 
     def draw(self):
-        print('here')
         plt.show()
 
     def addYAxis(self):

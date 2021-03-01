@@ -8,6 +8,7 @@ Created on Wed Jan  6 13:31:51 2021
 import Paths
 #import json
 from Basic import loadJsonFile
+from tqdm import tqdm
 
 
 
@@ -145,6 +146,10 @@ class DebugTextObj(object):
     def __init__(self, lan, username=None):
         self.text = Text(lan)
         self.username = None
+        self.progGoal = 100
+        self.currProgress = 0
+        self.progressBar = tqdm(range(self.progGoal))
+        self.progresIterator = None
     
     def getError(self, errType, *args):
         print('Error:', self.text.getError(errType, *args))
@@ -153,7 +158,28 @@ class DebugTextObj(object):
         print('Warning:', self.text.getWarning(warnType, *args))
         
     def moveErrorsToWarnings(self):
-        pass 
+        pass
+
+    def getProgressBar(self, iterable):
+        class ProgressBar:
+            def __init__(self, iterable):
+                self.iterable = iterable
+
+            def __iter__(self):
+                class ProgressIterator:
+                    def __init__(self, iterator):
+                        self.iterator = tqdm(iterator).__iter__()
+
+                    def __next__(self):
+                        return self.iterator.__next__()
+                return ProgressIterator(self.iterable)
+        return ProgressBar(iterable)
+
+
+
+
+
+
     
 # if Text object is not given (user sets language) use english Text object       
 def getTextObj(textObj):
