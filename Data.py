@@ -7,11 +7,18 @@ Created on Wed Jan 13 08:49:06 2021
 
 from pandas import DataFrame
 
-import Paths
-import IO
-import Basic
-import Texts
-from Functions import ParameterFunctionGroup
+if __name__ == "__main__":
+    import Paths
+    import IO
+    import Basic
+    import Texts
+    from Functions import ParameterFunctionGroup
+else:
+    from . import Paths
+    from . import IO
+    from . import Basic
+    from . import Texts
+    from .Functions import ParameterFunctionGroup
 #from GUI import GUIfunObj
 
 class Data(object):
@@ -51,6 +58,9 @@ class Data(object):
    
     def rename(self, dic):
         self.data = self.data.rename(columns=dic)
+
+    def shape(self):
+        return self.data.shape
 
 class Parameters(object):
 
@@ -193,7 +203,10 @@ class DataGroup(object):
         self._parameters.setGrpName(folder)
         
     def dirExists(self):
-        return Paths.isdir(self.groupDir)
+        if self.groupDir is not None:
+            return Paths.isdir(self.groupDir)
+        else:
+            return None
     
     def listDir(self):
         return Paths.listdir(self.groupDir)
@@ -242,7 +255,7 @@ class DataGroup(object):
         return len(self._data) > 0
 
     def parametersDefined(self):
-        return self._parameters.areDefinded()
+        return self._parameters.areDefined()
 
             
     

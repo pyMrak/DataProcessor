@@ -9,17 +9,25 @@ import re
 import os
 from os.path import isdir, isfile
 
+import os
+
+
+scriptDir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
 # Special files
 configFile = 'settings.cfg'
+configFilePath = os.path.join(scriptDir, configFile)
+
+
+
 
 # loads application settings file
-with open(configFile) as json_file:
+with open(configFilePath) as json_file:
     settings = json.load(json_file)
 
 # Folders
 server = settings['paths']['server']
-text = 'Text/'
+text = os.path.join(scriptDir, 'Text/')
 dataProcessorDir = server + 'DataProcessor/'
 
 globalDir = 'global/'

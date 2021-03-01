@@ -7,9 +7,14 @@ Created on Mon Jan 11 12:30:07 2021
 
 from numpy import where
 
-import Basic
-import Texts
-import Paths
+if __name__ == "__main__":
+    import Basic
+    import Paths
+    import Texts
+else:
+    from . import Paths
+    from . import Basic
+    from . import Texts
 
 
 class ParameterFunction(object):

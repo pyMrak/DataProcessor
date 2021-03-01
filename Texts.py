@@ -5,9 +5,14 @@ Created on Wed Jan  6 13:31:51 2021
 @author: andmra2
 """
 
-import Paths
+if __name__ == "__main__":
+    import Paths
+    from Basic import loadJsonFile
+else:
+    from . import Paths
+    from .Basic import loadJsonFile
 #import json
-from Basic import loadJsonFile
+
 
 
 

@@ -5,7 +5,11 @@ Created on Tue Jan 12 10:20:23 2021
 @author: andmra2
 """
 import json
-import Paths
+
+if __name__ == "__main__":
+    import Paths
+else:
+    from . import Paths
 
 
 

@@ -8,9 +8,14 @@ Created on Wed Jan  6 13:23:08 2021
 from pandas import read_csv, to_timedelta
 
 #from datetime import datetime#, timedelta, time
-import Basic
-import Paths
-import Texts
+if __name__ == "__main__":
+    import Basic
+    import Paths
+    import Texts
+else:
+    from . import Paths
+    from . import Basic
+    from . import Texts
 
 #from time import time
 
