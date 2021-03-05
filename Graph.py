@@ -1,8 +1,13 @@
 from matplotlib import pyplot as plt
 from numpy import array
+import os
 
-import Basic
-import Texts
+if os.path.dirname(__file__) == os.getcwd():
+    import Basic
+    import Texts
+else:
+    from . import Basic
+    from . import Texts
 
 
 
@@ -166,8 +171,12 @@ class GraphWrapper():
     def __init__(self, graphSettings=None, GUIobj=None, mlObj=None):
         self.graphSettings = graphSettings
         self.mlObj = mlObj
-        gsName = graphSettings
+        self.graph = None
         self.GUIobj = Texts.getTextObj(GUIobj)  # if GUI object is not given (user sets language) use english GUI object
+        self.setGraphSettings(graphSettings)
+
+    def setGraphSettings(self, graphSettings):
+        gsName = graphSettings
         if graphSettings is not None:
             graphSettings = Basic.loadUserGraphFile(graphSettings, self.GUIobj)
         if graphSettings is None:
@@ -183,7 +192,8 @@ class GraphWrapper():
             self.graph = self.types[defaultGraphSettings["type"]](defaultGraphSettings, self.GUIobj, self.mlObj)
 
     def draw(self, dgObj):
-        self.graph.draw(dgObj)
+        if self.graph is not None:
+            self.graph.draw(dgObj)
 
 
 
