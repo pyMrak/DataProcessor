@@ -6,8 +6,9 @@ Created on Mon Jan 11 12:30:07 2021
 """
 
 from numpy import where
+import os
 
-if __name__ == "__main__":
+if os.path.dirname(__file__) == os.getcwd():
     import Basic
     import Paths
     import Texts

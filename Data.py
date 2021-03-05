@@ -6,8 +6,9 @@ Created on Wed Jan 13 08:49:06 2021
 """
 
 from pandas import DataFrame
+import os
 
-if __name__ == "__main__":
+if os.path.dirname(__file__) == os.getcwd():
     import Paths
     import IO
     import Basic
@@ -74,13 +75,22 @@ class Parameters(object):
     def __getitem__(self, key):
         if key in self.df.index:
             return self.df.loc[key]
-        if key in self.df:
+        elif key in self.df:
             return self.df[key]
+        # elif type(key) == int:
+        #     newKey = self.df.index[key]
+        #     return self[newKey]
         else:
             raise KeyError(key)
 
     def __str__(self):
         return str(self.df)
+
+    def __iter__(self):
+        if self.df is not None:
+            return self.df.__iter__()
+        else:
+            return [].__iter__()
 
     def setGrpName(self, name):
         self.groupName = name
@@ -106,6 +116,10 @@ class Parameters(object):
         else:
             return False
 
+    def shape(self):
+        return self.df.shape
+
+
 class Parameter(object):
 
     def __init__(self, value=None):
@@ -121,7 +135,7 @@ class Parameter(object):
             valStr = str(round(self.value, self.rounding)).replace('.',',')
             if self.units is not None:
                 untStr = str(self.units)
-        return valStr + untStr
+        return valStr #+ untStr
 
     def __set__(self, instance, value):
         self.value = value
@@ -257,6 +271,9 @@ class DataGroup(object):
     def parametersDefined(self):
         return self._parameters.areDefined()
 
+    def getParamFunctionFiles(self):
+        return Basic.getUserParFunFiles(self.GUIobj)
+
             
     
         
@@ -266,5 +283,6 @@ if __name__ == "__main__":
     pdg = DataGroup(Paths.testDir)
     pdg.readPyro('functionalLab')
     pdg.getParameters('5011-721-414-QC')
+    print(type(pdg['parameters']))
     for d in pdg[0]:
         print('line:', d)

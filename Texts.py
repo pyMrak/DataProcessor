@@ -4,8 +4,10 @@ Created on Wed Jan  6 13:31:51 2021
 
 @author: andmra2
 """
+import os
+from tqdm import tqdm
 
-if __name__ == "__main__":
+if os.path.dirname(__file__) == os.getcwd():
     import Paths
     from Basic import loadJsonFile
 else:
@@ -156,7 +158,10 @@ class DebugTextObj(object):
         print('Warning:', self.text.getWarning(warnType, *args))
         
     def moveErrorsToWarnings(self):
-        pass 
+        pass
+
+    def getProgressBar(self, iterable):
+        return tqdm(iterable)
     
 # if Text object is not given (user sets language) use english Text object       
 def getTextObj(textObj):

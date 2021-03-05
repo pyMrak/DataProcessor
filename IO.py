@@ -6,9 +6,9 @@ Created on Wed Jan  6 13:23:08 2021
 """
 
 from pandas import read_csv, to_timedelta
+import os
 
-#from datetime import datetime#, timedelta, time
-if __name__ == "__main__":
+if os.path.dirname(__file__) == os.getcwd():
     import Basic
     import Paths
     import Texts

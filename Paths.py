@@ -18,7 +18,10 @@ scriptDir = os.path.dirname(__file__) #<-- absolute dir the script is in
 configFile = 'settings.cfg'
 configFilePath = os.path.join(scriptDir, configFile)
 
-
+#  extensions
+pfunExt = '.pfun'
+hdrExt = '.hdr'
+grfExt = '.grf'
 
 
 # loads application settings file
@@ -61,12 +64,12 @@ def getUserParFunFold(username):
 
 # return parameter function file of an user
 def getUserParFunFile(username, file):
-    return getUserParFunFold(username) + file + '.pfun'
+    return getUserParFunFold(username) + file + pfunExt
 
 
 # return parameter global function file
 def getGlobalParFunFile(file):
-    return globalParFun + file + '.pfun'
+    return globalParFun + file + pfunExt
 
 
 def getUserHdrFold(username):
@@ -74,21 +77,21 @@ def getUserHdrFold(username):
 
 
 def getUserHdrFile(username, file):
-    return  getUserHdrFold(username) + file + '.hdr'
+    return  getUserHdrFold(username) + file + hdrExt
 
 
 def getGlobalHdrFile(file):
-    return globalHeaders + file + '.hdr'
+    return globalHeaders + file + hdrExt
 
 def getUserGraphFold(username):
     return graphs + username + '/'
 
 def getUserGraphFile(username, file):
-    return getUserGraphFold(username) + file + '.grf'
+    return getUserGraphFold(username) + file + grfExt
 
 
 def getGlobalGraphFile(file):
-    return globalGraphs + file + '.grf'
+    return globalGraphs + file + grfExt
 
 
 def atof(text):
@@ -118,8 +121,17 @@ def humanSort(lis):
         return []
 
 
-def listdir(directory):
-    return humanSort(os.listdir(directory))
+def listdir(directory, ext=None):
+    fileList = humanSort(os.listdir(directory))
+    if ext is None:
+        return fileList
+    else:
+        extLen = len(ext)
+        fileListExt = []
+        for file in fileList:
+            if file[-extLen:] == ext:
+                fileListExt.append(file)
+        return fileListExt
 
 
 

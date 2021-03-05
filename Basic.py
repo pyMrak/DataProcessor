@@ -5,8 +5,9 @@ Created on Tue Jan 12 10:20:23 2021
 @author: andmra2
 """
 import json
+import os
 
-if __name__ == "__main__":
+if os.path.dirname(__file__) == os.getcwd():
     import Paths
 else:
     from . import Paths
@@ -72,3 +73,38 @@ def loadUserHdrFile(headerFile, textObj=None):
 def loadUserGraphFile(graphFile, GUIobj=None):
     return loadServerFile(graphFile, Paths.getUserGraphFile, Paths.getGlobalGraphFile,
                           'hdrFileNotExists', GUIobj)
+
+def getServerFiles(pathArray, ext):
+    serverFiles = []
+    for path in pathArray:
+        print(path, Paths.isdir(path))
+        if Paths.isdir(path):
+            print('a')
+            for file in Paths.listdir(path, ext):
+                fileWOExt = file.split('.', 1)[0]
+                if fileWOExt not in serverFiles:
+                    serverFiles.append(fileWOExt)
+    return serverFiles
+
+
+
+def getUserParFunFiles(textObj=None):
+    paths = [Paths.globalParFun]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserParFunFold(textObj.username))
+    return getServerFiles(paths, Paths.pfunExt)
+
+def getUserHdrFiles(textObj=None):
+    paths = [Paths.globalHeaders]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserHdrFold(textObj.username))
+    return getServerFiles(paths, Paths.hdrExt)
+
+def getUserGrfFiles(textObj=None):
+    paths = [Paths.globalGraphs]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserGraphFold(textObj.username))
+    return getServerFiles(paths, Paths.grfExt)
