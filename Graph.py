@@ -1,6 +1,8 @@
 from matplotlib import pyplot as plt
 from numpy import array
 import os
+plt.rcParams['toolbar'] = 'toolmanager'
+from matplotlib.backend_tools import ToolBase
 
 if os.path.dirname(__file__) == os.getcwd():
     import Basic
@@ -10,12 +12,48 @@ else:
     from . import Texts
 
 
+class showNext(ToolBase):
+    """Show next graph."""
+    default_keymap = 'N'
+    description = 'Show next graph'
+
+    def __init__(self, *args, graph, **kwargs):
+        self.graph = graph
+        super().__init__(*args, **kwargs)
+
+    def trigger(self, *args, **kwargs):
+        self.graph.next()
+        self.graph.draw()
+        self.graph.mlObj.figure.canvas.draw()
+
+class showPrev(ToolBase):
+    """Show next graph."""
+    default_keymap = 'P'
+    description = 'Show previous graph'
+
+    def __init__(self, *args, graph, **kwargs):
+        self.graph = graph
+        super().__init__(*args, **kwargs)
+
+    def trigger(self, *args, **kwargs):
+        self.graph.prev()
+        self.graph.draw()
+        self.graph.mlObj.figure.canvas.draw()
+
+        #self.graph.draw(draw=False)
+
+
+
 
 class MatplotlibObject():
 
-    def __init__(self):
+    def __init__(self, graph):
         plt.style.use('ggplot')
         self.figure = plt.figure()
+        self.figure.canvas.manager.toolmanager.add_tool('Prev', showPrev, graph=graph)
+        self.figure.canvas.manager.toolmanager.add_tool('Next', showNext, graph=graph)
+        self.figure.canvas.manager.toolbar.add_tool('Prev', 'show')
+        self.figure.canvas.manager.toolbar.add_tool('Next', 'show')
         self.ax = self.figure.add_subplot(111)
         self.ax2 = None
 
@@ -40,22 +78,30 @@ class Graph():
     def __init__(self, graphSettings, GUIobj, mlObj=None, currIdx=None):
         self.GUIobj = GUIobj
         self.graphSettings = graphSettings
-        self.secondYAxis = []
+
+        self.dgObj = None
         if currIdx is None:
             self.currentIdx = 0
         else:
             self.currentIdx = currIdx
         if "y2-axis" in self.graphSettings:
             self.secondYAxis = self.graphSettings["y2-axis"]
+        else:
+            self.secondYAxis = []
+        if "exclude" in self.graphSettings:
+            self.exclude = self.graphSettings["exclude"]
+        else:
+            self.exclude = []
         if mlObj is None:
             self.mlObj = self._getFigure()
         else:
             self.mlObj = mlObj
+
         if len(self.secondYAxis) > 0:
             self.mlObj.addYAxis()
 
     def _getFigure(self):
-        return MatplotlibObject()
+        return MatplotlibObject(self)
 
     def setLim(self):
         self.setXLim()
@@ -93,6 +139,12 @@ class Graph():
 
     def setCurrIdx(self, idx):
         self.currentIdx = idx
+
+    def next(self):
+        self.currentIdx += 1
+
+    def prev(self):
+        self.currentIdx -= 1
         #print('not:', self.currentIdx, self)
 
     def getCurrIdx(self):
@@ -109,74 +161,81 @@ class LineGraph(Graph):
         Graph.__init__(self, graphSettings=graphSettings, GUIobj=GUIobj, mlObj=mlObj, currIdx=currIdx)
 
 
-    def draw(self, dgObj):
-        if dgObj.isDefined():
-            xAxis = None
-            if "x-axis" in self.graphSettings:
-                xAxisEntity = self.graphSettings["x-axis"]
-                xAxisLabel = xAxisEntity
-                if xAxisEntity in dgObj[self.currentIdx]:
-                    xAxis = dgObj[self.currentIdx][xAxisEntity]
-                    xUnits = dgObj.getUnits(xAxisEntity)
-                    if xUnits is not None:
-                        xAxisLabel += ' [' + str(xUnits) + ']'
-                else:
-                    self.GUIobj.getError('lineGXNotPres', xAxisEntity, dgObj[self.currentIdx].groupDir)
-            else:
-                self.GUIobj.getError('lineGXNotSet', self.graphSettings["name"])
-            if xAxis is not None:
+    def draw(self, dgObj=None, draw=True):
 
-                self.mlObj.ax.clear()
+        if dgObj is not None:
+            self.dgObj = dgObj
+        if self.dgObj is not None:
+            if self.dgObj.isDefined():
+                xAxis = None
+                if "x-axis" in self.graphSettings:
+                    xAxisEntity = self.graphSettings["x-axis"]
+                    xAxisLabel = xAxisEntity
+                    if xAxisEntity in self.dgObj[self.currentIdx]:
+                        xAxis = self.dgObj[self.currentIdx][xAxisEntity]
+                        xUnits = self.dgObj.getUnits(xAxisEntity)
+                        if xUnits is not None:
+                            xAxisLabel += ' [' + str(xUnits) + ']'
+                    else:
+                        self.GUIobj.getError('lineGXNotPres', xAxisEntity, self.dgObj[self.currentIdx].groupDir)
+                else:
+                    self.GUIobj.getError('lineGXNotSet', self.graphSettings["name"])
+                if xAxis is not None:
+
+                    self.mlObj.ax.clear()
+                    if self.mlObj.ax2 is not None:
+                        self.mlObj.ax2.clear()
+                    # TODO move to __init__
+                    colors = ["#1abc9c"]
+                    lenColors = 1
+                    if "colors" in self.graphSettings:
+                        if len(self.graphSettings["colors"]) > 0:
+                            colors = self.graphSettings["colors"]
+                            lenColors = len(colors)
+                        else:
+                            self.GUIobj.getWarning('graphColEmpty', self.graphSettings["name"])
+                    else:
+                        self.GUIobj.getWarning('graphColNotSet', self.graphSettings["name"])
+                    colIdx = 0
+                    yAxisLabel = ''
+                    y2AxisLabel = ''
+                    comm = ''
+                    comm2 = ''
+                    for entity in self.dgObj[self.currentIdx]:
+                        if entity not in self.exclude:
+                            if entity is not xAxisEntity:
+                                units = self.dgObj.getUnits(entity)
+                                if entity in self.secondYAxis:
+                                    ax = self.mlObj.ax2
+                                    y2AxisLabel += comm2 + entity
+                                    if units is not None:
+                                        y2AxisLabel += ' [' + str(units) + ']'
+                                    comm2 = ', '
+                                else:
+                                    ax = self.mlObj.ax
+                                    yAxisLabel += comm + entity
+                                    if units is not None:
+                                        yAxisLabel += ' [' + str(units) + ']'
+                                    comm = ', '
+                                ax.plot(xAxis, self.dgObj[self.currentIdx][entity],
+                                        c=colors[colIdx], label=self.dgObj[self.currentIdx].groupDir)
+                                colIdx += 1
+                                if colIdx >= lenColors:
+                                    colIdx = 0
+                    self.setXLabel(xAxisLabel)
+                    self.setYLabels(yAxisLabel, y2AxisLabel)
+                    self.setLim()
+                    self.setTitle(self.dgObj.getFileName(self.currentIdx))
+                self.mlObj.format()
+                if draw:
+                    self.mlObj.draw()
+            else:
                 if self.mlObj.ax2 is not None:
                     self.mlObj.ax2.clear()
-                # TODO move to __init__
-                colors = ["#1abc9c"]
-                lenColors = 1
-                if "colors" in self.graphSettings:
-                    if len(self.graphSettings["colors"]) > 0:
-                        colors = self.graphSettings["colors"]
-                        lenColors = len(colors)
-                    else:
-                        self.GUIobj.getWarning('graphColEmpty', self.graphSettings["name"])
-                else:
-                    self.GUIobj.getWarning('graphColNotSet', self.graphSettings["name"])
-                colIdx = 0
-                yAxisLabel = ''
-                y2AxisLabel = ''
-                comm = ''
-                comm2 = ''
-                for entity in dgObj[self.currentIdx]:
-                    if entity is not xAxisEntity:
-                        units = dgObj.getUnits(entity)
-                        if entity in self.secondYAxis:
-                            ax = self.mlObj.ax2
-                            y2AxisLabel += comm2 + entity
-                            if units is not None:
-                                y2AxisLabel += ' [' + str(units) + ']'
-                            comm2 = ', '
-                        else:
-                            ax = self.mlObj.ax
-                            yAxisLabel += comm + entity
-                            if units is not None:
-                                yAxisLabel += ' [' + str(units) + ']'
-                            comm = ', '
-                        ax.plot(xAxis, dgObj[self.currentIdx][entity],
-                                c=colors[colIdx], label=dgObj[self.currentIdx].groupDir)
-                        colIdx += 1
-                        if colIdx >= lenColors:
-                            colIdx = 0
-                self.setXLabel(xAxisLabel)
-                self.setYLabels(yAxisLabel, y2AxisLabel)
-                self.setLim()
-                self.setTitle(dgObj.getFileName(self.currentIdx))
-            self.mlObj.format()
-            self.mlObj.draw()
-        else:
-            if self.mlObj.ax2 is not None:
-                self.mlObj.ax2.clear()
-            self.mlObj.ax.clear()
-            self.mlObj.format()
-            self.mlObj.draw()
+                self.mlObj.ax.clear()
+                self.mlObj.format()
+                if draw:
+                    self.mlObj.draw()
 
 
 
@@ -191,6 +250,7 @@ class GraphWrapper():
         self.graphSettings = graphSettings
         self.mlObj = mlObj
         self.graph = None
+        self.dgObj = None
         self.GUIobj = Texts.getTextObj(GUIobj)  # if GUI object is not given (user sets language) use english GUI object
         self.setGraphSettings(graphSettings)
 
@@ -216,8 +276,10 @@ class GraphWrapper():
                                                                   surrIdx)
 
     def draw(self, dgObj):
-        if self.graph is not None:
-            self.graph.draw(dgObj)
+        if dgObj is not None:
+            self.dgObj = dgObj
+            if self.graph is not None:
+                self.graph.draw(dgObj)
 
     def setCurrIdx(self, idx):
         self.graph.setCurrIdx(idx)
@@ -227,16 +289,17 @@ class GraphWrapper():
 
 
 defaultGraphSettings = {"type": "line",
-                        "colors": ["#1abc9c", # Turquoise
-                                   "#3498db", # Peterriver (blue)
-                                    "#e74c3c", # Alizarin (red)
-                                    "#f1c40f", # Sunflower (yellow)
-                                    "#9b59b6", # Amethyst (violet)
+                        "colors": ["#000000",  # black
+                                   "#e74c3c",  # Alizarin (red)
+                                   "#1abc9c",  # Turquoise
+                                   "#3498db",  # Peterriver (blue)
+                                    "#f1c40f",  # Sunflower (yellow)
+                                    "#9b59b6",  # Amethyst (violet)
                                     "#f39c12",  # Orange
                                     "#ecf0f1",  # Clouds (white)
-                                    "#2ecc71", # Emerald
-                                    "#2980b9" # Belizehole (blue)
-                                    "#c0392b", # Pomegranate (red)
+                                    "#2ecc71",  # Emerald
+                                    "#2980b9",  # Belizehole (blue)
+                                    "#c0392b",  # Pomegranate (red)
                                     "#d35400",  # Pumpkin (orange)
                                    ],
                         "x-axis": "t",
@@ -247,5 +310,5 @@ if __name__ == "__main__":
     import Paths
     pdg = DataGroup(Paths.testDir)
     pdg.readPyro('functionalLab')
-    g = GraphWrapper('functionalGP')
+    g = GraphWrapper('functionalTCGP')
     g.draw(pdg)
