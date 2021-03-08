@@ -34,6 +34,7 @@ class MatplotlibObject():
 
 
 
+
 class Graph():
 
     def __init__(self, graphSettings, GUIobj, mlObj=None):
@@ -98,66 +99,75 @@ class LineGraph(Graph):
         self.currentIdx = 0
 
     def draw(self, dgObj):
-
-        xAxis = None
-        if "x-axis" in self.graphSettings:
-            xAxisEntity = self.graphSettings["x-axis"]
-            xAxisLabel = xAxisEntity
-            if xAxisEntity in dgObj[self.currentIdx]:
-                xAxis = dgObj[self.currentIdx][xAxisEntity]
-                xUnits = dgObj.getUnits(xAxisEntity)
-                if xUnits is not None:
-                    xAxisLabel += ' [' + str(xUnits) + ']'
-            else:
-                self.GUIobj.getError('lineGXNotPres', xAxisEntity, dgObj[self.currentIdx].groupDir)
-        else:
-            self.GUIobj.getError('lineGXNotSet', self.graphSettings["name"])
-        if xAxis is not None:
-
-            self.mlObj.ax.clear()
-            # TODO move to __init__
-            colors = ["#1abc9c"]
-            lenColors = 1
-            if "colors" in self.graphSettings:
-                if len(self.graphSettings["colors"]) > 0:
-                    colors = self.graphSettings["colors"]
-                    lenColors = len(colors)
+        print("evo")
+        if dgObj.isDefined():
+            xAxis = None
+            if "x-axis" in self.graphSettings:
+                xAxisEntity = self.graphSettings["x-axis"]
+                xAxisLabel = xAxisEntity
+                if xAxisEntity in dgObj[self.currentIdx]:
+                    xAxis = dgObj[self.currentIdx][xAxisEntity]
+                    xUnits = dgObj.getUnits(xAxisEntity)
+                    if xUnits is not None:
+                        xAxisLabel += ' [' + str(xUnits) + ']'
                 else:
-                    self.GUIobj.getWarning('graphColEmpty', self.graphSettings["name"])
+                    self.GUIobj.getError('lineGXNotPres', xAxisEntity, dgObj[self.currentIdx].groupDir)
             else:
-                self.GUIobj.getWarning('graphColNotSet', self.graphSettings["name"])
-            colIdx = 0
-            yAxisLabel = ''
-            y2AxisLabel = ''
-            comm = ''
-            comm2 = ''
-            for entity in dgObj[self.currentIdx]:
-                if entity is not xAxisEntity:
-                    units = dgObj.getUnits(entity)
-                    if entity in self.secondYAxis:
-                        ax = self.mlObj.ax2
-                        y2AxisLabel += comm2 + entity
-                        if units is not None:
-                            y2AxisLabel += ' [' + str(units) + ']'
-                        comm2 = ', '
+                self.GUIobj.getError('lineGXNotSet', self.graphSettings["name"])
+            if xAxis is not None:
+
+                self.mlObj.ax.clear()
+                if self.mlObj.ax2 is not None:
+                    self.mlObj.ax2.clear()
+                # TODO move to __init__
+                colors = ["#1abc9c"]
+                lenColors = 1
+                if "colors" in self.graphSettings:
+                    if len(self.graphSettings["colors"]) > 0:
+                        colors = self.graphSettings["colors"]
+                        lenColors = len(colors)
                     else:
-                        ax = self.mlObj.ax
-                        yAxisLabel += comm + entity
-                        if units is not None:
-                            yAxisLabel += ' [' + str(units) + ']'
-                        comm = ', '
-                    ax.plot(xAxis, dgObj[self.currentIdx][entity],
-                            c=colors[colIdx], label=dgObj[self.currentIdx].groupDir)
-                    colIdx += 1
-                    if colIdx >= lenColors:
-                        colIdx = 0
-            self.setXLabel(xAxisLabel)
-            self.setYLabels(yAxisLabel, y2AxisLabel)
-            self.setLim()
-            self.setTitle(dgObj.getFileName(self.currentIdx))
+                        self.GUIobj.getWarning('graphColEmpty', self.graphSettings["name"])
+                else:
+                    self.GUIobj.getWarning('graphColNotSet', self.graphSettings["name"])
+                colIdx = 0
+                yAxisLabel = ''
+                y2AxisLabel = ''
+                comm = ''
+                comm2 = ''
+                for entity in dgObj[self.currentIdx]:
+                    if entity is not xAxisEntity:
+                        units = dgObj.getUnits(entity)
+                        if entity in self.secondYAxis:
+                            ax = self.mlObj.ax2
+                            y2AxisLabel += comm2 + entity
+                            if units is not None:
+                                y2AxisLabel += ' [' + str(units) + ']'
+                            comm2 = ', '
+                        else:
+                            ax = self.mlObj.ax
+                            yAxisLabel += comm + entity
+                            if units is not None:
+                                yAxisLabel += ' [' + str(units) + ']'
+                            comm = ', '
+                        ax.plot(xAxis, dgObj[self.currentIdx][entity],
+                                c=colors[colIdx], label=dgObj[self.currentIdx].groupDir)
+                        colIdx += 1
+                        if colIdx >= lenColors:
+                            colIdx = 0
+                self.setXLabel(xAxisLabel)
+                self.setYLabels(yAxisLabel, y2AxisLabel)
+                self.setLim()
+                self.setTitle(dgObj.getFileName(self.currentIdx))
             self.mlObj.format()
             self.mlObj.draw()
-
+        else:
+            if self.mlObj.ax2 is not None:
+                self.mlObj.ax2.clear()
+                print("tuki")
+            self.mlObj.ax.clear()
+            self.mlObj.format()
+            self.mlObj.draw()
 
 
 
@@ -194,6 +204,7 @@ class GraphWrapper():
     def draw(self, dgObj):
         if self.graph is not None:
             self.graph.draw(dgObj)
+
 
 
 
