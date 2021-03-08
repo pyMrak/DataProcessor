@@ -37,10 +37,14 @@ class MatplotlibObject():
 
 class Graph():
 
-    def __init__(self, graphSettings, GUIobj, mlObj=None):
+    def __init__(self, graphSettings, GUIobj, mlObj=None, currIdx=None):
         self.GUIobj = GUIobj
         self.graphSettings = graphSettings
         self.secondYAxis = []
+        if currIdx is None:
+            self.currentIdx = 0
+        else:
+            self.currentIdx = currIdx
         if "y2-axis" in self.graphSettings:
             self.secondYAxis = self.graphSettings["y2-axis"]
         if mlObj is None:
@@ -87,6 +91,13 @@ class Graph():
     def setTitle(self, title):
         self.mlObj.ax.set_title(title)
 
+    def setCurrIdx(self, idx):
+        self.currentIdx = idx
+        #print('not:', self.currentIdx, self)
+
+    def getCurrIdx(self):
+        return self.currentIdx
+
 
 
 
@@ -94,12 +105,11 @@ class Graph():
 
 class LineGraph(Graph):
 
-    def __init__(self, graphSettings, GUIobj, mlObj=None):
-        Graph.__init__(self, graphSettings=graphSettings, GUIobj=GUIobj, mlObj=mlObj)
-        self.currentIdx = 0
+    def __init__(self, graphSettings, GUIobj, mlObj=None, currIdx=None):
+        Graph.__init__(self, graphSettings=graphSettings, GUIobj=GUIobj, mlObj=mlObj, currIdx=currIdx)
+
 
     def draw(self, dgObj):
-        print("evo")
         if dgObj.isDefined():
             xAxis = None
             if "x-axis" in self.graphSettings:
@@ -164,7 +174,6 @@ class LineGraph(Graph):
         else:
             if self.mlObj.ax2 is not None:
                 self.mlObj.ax2.clear()
-                print("tuki")
             self.mlObj.ax.clear()
             self.mlObj.format()
             self.mlObj.draw()
@@ -195,15 +204,23 @@ class GraphWrapper():
             graphSettings["name"] = "Default"
         else:
             graphSettings["name"] = gsName
+        if self.graph is not None:
+            surrIdx = self.graph.getCurrIdx()
+        else:
+            surrIdx = 0
         if "type" in graphSettings: # TODO add exceptions
             if graphSettings["type"] in self.types:
-                self.graph = self.types[graphSettings["type"]](graphSettings, self.GUIobj, self.mlObj)
+                self.graph = self.types[graphSettings["type"]](graphSettings, self.GUIobj, self.mlObj, surrIdx)
         else:
-            self.graph = self.types[defaultGraphSettings["type"]](defaultGraphSettings, self.GUIobj, self.mlObj)
+            self.graph = self.types[defaultGraphSettings["type"]](defaultGraphSettings, self.GUIobj, self.mlObj,
+                                                                  surrIdx)
 
     def draw(self, dgObj):
         if self.graph is not None:
             self.graph.draw(dgObj)
+
+    def setCurrIdx(self, idx):
+        self.graph.setCurrIdx(idx)
 
 
 
