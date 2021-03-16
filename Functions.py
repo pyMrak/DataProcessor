@@ -20,10 +20,10 @@ else:
 
 class ParameterFunction(object):
     
-    def __init__(self, funParam, ParameterObj=None, GUIobj=None):
+    def __init__(self, fun, ParameterObj=None, GUIobj=None):
         self.GUIobj = Texts.getTextObj(GUIobj)
         self.ParameterObj = ParameterObj
-        funParam = funParam['parameters']
+        funParam = fun['parameters']
         if 'feature1' in funParam:  # if feature1 is defined in funParam set its value to self.feature1
             self.feature1 = funParam['feature1']
         else:  # if feature1 is not defined in funParam set self.feature1 value to None
@@ -36,8 +36,8 @@ class ParameterFunction(object):
             self.value = funParam['value']
         else:  # if value is not defined in funParam set self.value value to None
             self.value = None
-        if 'evaluation' in funParam:  # if evaluation is defined in funParam create Evaluation object from the definition
-            self.evaluation = Evaluation(funParam['evaluation'], GUIobj=self.GUIobj)
+        if 'evaluation' in fun:  # if evaluation is defined in funParam create Evaluation object from the definition
+            self.evaluation = Evaluation(fun['evaluation'], GUIobj=self.GUIobj)
         else:  # else create empty Evaluation object
             self.evaluation = Evaluation()
         if 'rounding' in funParam:  # if rounding is defined in funParam
@@ -88,7 +88,7 @@ class Evaluation(object):
             if self.max is not None:  # if self.max is defined check if value is less or equal
                 if value > self.max:
                     return False  # if value is higher than self.max return False
-            if self.min is not None:  # if self.mmin is defined check if value is more or equal
+            if self.min is not None:  # if self.min is defined check if value is more or equal
                 if value < self.min:
                     return False  # if value is lower than self.min return False
             return True  # if value is in specified range return True
