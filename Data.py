@@ -49,7 +49,7 @@ class Data(object):
         elif key == 'units':
             return self.units
         else:
-            raise KeyError(key)
+            return self.data
     
     def __iter__(self):
        return self.data.__iter__()
@@ -77,9 +77,9 @@ class Parameters(object):
             return self.df.loc[key]
         elif key in self.df:
             return self.df[key]
-        # elif type(key) == int:
-        #     newKey = self.df.index[key]
-        #     return self[newKey]
+        elif type(key) == int:
+             newKey = self.df.index[key]
+             return self[newKey]
         else:
             raise KeyError(key)
 
@@ -132,7 +132,7 @@ class Parameter(object):
         valStr = ''
         untStr = ''
         if self.value is not None:
-            valStr = str(round(self.value, self.rounding)).replace('.',',')
+            valStr = str(round(self.value, self.rounding)).replace('.', ',')
             if self.units is not None:
                 untStr = str(self.units)
         return valStr #+ untStr
@@ -142,6 +142,18 @@ class Parameter(object):
 
     def __get__(self, instance, owner):
         return self.value
+
+    def __lt__(self, other):
+        return self.value < other
+
+    def __gt__(self, other):
+        return self.value > other
+
+    def __eq__(self, other):
+        return self.value == other
+
+    def __ne__(self, other):
+        return self.value != other
 
     def setValid(self, valid):
         self.valid = valid
