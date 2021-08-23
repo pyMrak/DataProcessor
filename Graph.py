@@ -49,6 +49,7 @@ class MatplotlibObject():
 
     def __init__(self, graph):
         plt.style.use('ggplot')
+        #plt.tight_layout()
         self.figure = plt.figure()
         self.figure.canvas.manager.toolmanager.add_tool('Prev', showPrev, graph=graph)
         self.figure.canvas.manager.toolmanager.add_tool('Next', showNext, graph=graph)
@@ -150,6 +151,9 @@ class Graph():
     def getCurrIdx(self):
         return self.currentIdx
 
+    def setLegend(self, lines, labels):
+        self.mlObj.ax.legend(lines, labels, loc='best')
+
 
 
 
@@ -201,6 +205,8 @@ class LineGraph(Graph):
                     y2AxisLabel = ''
                     comm = ''
                     comm2 = ''
+                    lines = []
+                    labels = []
                     for entity in self.dgObj[self.currentIdx]:
                         if entity not in self.exclude:
                             if entity is not xAxisEntity:
@@ -217,13 +223,16 @@ class LineGraph(Graph):
                                     if units is not None:
                                         yAxisLabel += ' [' + str(units) + ']'
                                     comm = ', '
-                                ax.plot(xAxis, self.dgObj[self.currentIdx][entity],
-                                        c=colors[colIdx], label=self.dgObj[self.currentIdx].groupDir)
+                                line, = ax.plot(xAxis, self.dgObj[self.currentIdx][entity],
+                                               c=colors[colIdx], label=entity) #self.dgObj[self.currentIdx].groupDir
+                                lines.append(line)
+                                labels.append(entity)
                                 colIdx += 1
                                 if colIdx >= lenColors:
                                     colIdx = 0
                     self.setXLabel(xAxisLabel)
                     self.setYLabels(yAxisLabel, y2AxisLabel)
+                    self.setLegend(lines, labels)
                     self.setLim()
                     self.setTitle(self.dgObj.getFileName(self.currentIdx))
                 self.mlObj.format()
