@@ -234,7 +234,7 @@ class DataGroup(object):
             return None
     
     def listDir(self):
-        return Paths.listdir(self.groupDir)
+        return Basic.rearrangeUp(Paths.listdir(self.groupDir))
     
     def readPyro(self, headerFile=None):
         if self.dirExists():  # if directory exists

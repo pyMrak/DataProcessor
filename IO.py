@@ -42,7 +42,7 @@ def readPyroDir(dirPath, textObj=None):
     output = {}  # initialize output dictionary
     textObj = Texts.getTextObj(textObj)  # if Text object is not given (user sets language) use english Text object
     if Paths.isdir(dirPath):  # if directory exists 
-        for file in Paths.listdir(dirPath):  # iterate trough its content
+        for file in Basic.rearrangeUp(Paths.listdir(dirPath)):  # iterate trough its content
             out = readPyroFile(dirPath, file, textObj)  # try to read every item in the directory
             if out is not None:  # if file as been read 
                 fileName = Basic.removeExt(file)  # get file name without extension

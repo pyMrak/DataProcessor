@@ -6,6 +6,8 @@ Created on Tue Jan 12 10:20:23 2021
 """
 import json
 import os
+import re
+from numpy import argsort, array
 
 if os.path.dirname(__file__) == os.getcwd():
     import Paths
@@ -108,3 +110,53 @@ def getUserGrfFiles(textObj=None):
         if textObj.username is not None:
             paths.append(Paths.getUserGraphFold(textObj.username))
     return getServerFiles(paths, Paths.grfExt)
+
+def atof(text):
+    try:
+        retval = float(text)
+    except ValueError:
+        retval = text
+    return retval
+
+def naturalKeys(text):
+    '''
+    alist.sort(key=natural_keys) sorts in human order
+    http://nedbatchelder.com/blog/200712/human_sorting.html
+    (See Toothy's implementation in the comments)
+    float regex comes from https://stackoverflow.com/a/12643073/190597
+    '''
+    return [atof(c) for c in re.split(r'[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)', text)]
+
+def naturalList(l):
+    return [naturalKeys(k) for k in l]
+
+def lessThan(value, compValue):
+    value = value.replace(',', '.')
+    compValue = compValue.replace(',', '.')
+    l = [value, compValue]
+    l.sort(key=naturalKeys)
+    return value == l[0]
+
+def sortIdx(seq):
+    #http://stackoverflow.com/questions/3382352/equivalent-of-numpy-argsort-in-basic-python/3382369#3382369
+    #by unutbu
+    #print('a', seq.__getitem__)
+    seq = naturalList(seq)
+    return sorted(range(len(seq)), key=seq.__getitem__)
+
+def rearrangeUp(lis):
+    if lis is not None:
+        temp = []
+        for item in lis:
+            temp.append(item.split('.', 1)[0].replace(',', '.'))
+        #lis.sort(key=naturalKeys)
+        a = sortIdx(temp)
+        return array(lis)[a]
+    else:
+        return []
+
+
+
+if __name__ == "__main__":
+    a = Paths.listdir("//10.110.8.81/AET-SI-TO-Izmenjava/Andrej_Mrak/__Nove_Meritve/968/968TTrekvalifikacija")
+    rearrangeUp(a)
