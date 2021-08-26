@@ -119,6 +119,15 @@ class Parameters(object):
     def shape(self):
         return self.df.shape
 
+    def areValid(self, key):
+        valid = True
+        for parameter in self.df.loc[key]:
+            parVal = parameter.isValid()
+            if parVal is None:
+                parVal = False
+            valid *= parVal
+        return valid
+
 
 class Parameter(object):
 
