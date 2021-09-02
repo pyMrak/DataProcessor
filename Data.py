@@ -70,7 +70,7 @@ class Parameters(object):
         self.GUIobj = Texts.getTextObj(GUIobj)
         self.groupName = groupName
         self.functionFile = None
-        self._pfg = ParameterFunctionGroup(Parameter, self.GUIobj.username)
+        self._pfg = ParameterFunctionGroup(Parameter, self.GUIobj)
 
     def __getitem__(self, key):
         if key in self.df.index:
