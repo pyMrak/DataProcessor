@@ -31,6 +31,10 @@ def loadJsonFile(fileName, textObj=None):
                 print('jsonNotReadable', fileName)  # TODO popravi na bolj "GUI" varianto
             return {}
 
+def saveJsonFile(fileName, content, textObj=None):
+    with open(fileName, "w") as jsonFile:
+        return json.dump(content, jsonFile, indent=4)
+
 
 # checks if file is a txt file
 def isTxt(file):
@@ -140,6 +144,11 @@ def loadUserGUIPreset(textObj=None):
     paths = loadJsonFile(files["paths"])
     return settings, paths
 
+def saveUserGUIPresets(settings, paths, textObj=None):
+    if textObj is not None:
+        saveJsonFile(Paths.getUserGUISettFile(textObj.username), settings)
+        saveJsonFile(Paths.getUserGUIPathFile(textObj.username), paths)
+
 def getGUIMeasPresets(textObj=None):
     settings, paths = loadUserGUIPreset(textObj)
     return {'folder': paths["dataFolder"],
@@ -149,6 +158,14 @@ def getGUIMeasPresets(textObj=None):
             'grfFile': settings["graphFile"]
             }
 
+def saveGUIMeasUserPreset(presets, textObj=None):
+    if textObj is not None:
+        settings, paths = loadUserGUIPreset(textObj)
+        settings["headerFile"] = presets['hdrFile']
+        settings["parameterFile"] = presets['paramFile']
+        settings["graphFile"] = presets['grfFile']
+        paths["dataFolder"] = presets['folder']
+        saveUserGUIPresets(settings, paths, textObj)
 
 def atof(text):
     try:
