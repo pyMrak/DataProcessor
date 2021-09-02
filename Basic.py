@@ -7,6 +7,7 @@ Created on Tue Jan 12 10:20:23 2021
 import json
 import os
 import re
+import shutil
 from numpy import argsort, array
 
 if os.path.dirname(__file__) == os.getcwd():
@@ -110,6 +111,44 @@ def getUserGrfFiles(textObj=None):
         if textObj.username is not None:
             paths.append(Paths.getUserGraphFold(textObj.username))
     return getServerFiles(paths, Paths.grfExt)
+
+def getUserGUIFiles(textObj=None):
+    if textObj is None:
+        return {"settings": Paths.globalGUISettFile,
+                "paths": Paths.globalGUIPathsFile}
+    else:
+        settFile, pathFile = checkUserGUIFiles(textObj)
+        return {"settings": settFile,
+                "paths": pathFile}
+
+def checkUserGUIFiles(textObj=None):
+    if textObj is not None:
+        userFolder = Paths.getUserGUIFold(textObj.username)
+        if not Paths.isdir(userFolder):
+            os.mkdir(userFolder)
+        userPathFile = Paths.getUserGUIPathFile(textObj.username)
+        userSettFile = Paths.getUserGUISettFile(textObj.username)
+        if not Paths.checkUserGUIFiles(textObj.username):
+            shutil.copy(Paths.globalGUIPathsFile, userPathFile)
+            shutil.copy(Paths.globalGUISettFile, userSettFile)
+        return userSettFile, userPathFile
+    return Paths.globalGUISettFile, Paths.globalGUIPathsFile
+
+def loadUserGUIPreset(textObj=None):
+    files = getUserGUIFiles(textObj)
+    settings = loadJsonFile(files["settings"])
+    paths = loadJsonFile(files["paths"])
+    return settings, paths
+
+def getGUIMeasPresets(textObj=None):
+    settings, paths = loadUserGUIPreset(textObj)
+    return {'folder': paths["dataFolder"],
+            'currViewIdx': 0,
+            'hdrFile': settings["headerFile"],
+            'paramFile': settings["parameterFile"],
+            'grfFile': settings["graphFile"]
+            }
+
 
 def atof(text):
     try:

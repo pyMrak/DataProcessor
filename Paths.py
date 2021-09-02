@@ -22,6 +22,7 @@ configFilePath = os.path.join(scriptDir, configFile)
 pfunExt = '.pfun'
 hdrExt = '.hdr'
 grfExt = '.grf'
+setExt = '.set'
 
 
 # loads application settings file
@@ -44,6 +45,11 @@ globalHeaders = headers + globalDir
 graphs = dataProcessorDir + 'Graphs/'
 globalGraphs = graphs + globalDir
 
+GUIsett = dataProcessorDir + "GUI/"
+globalGUISett = GUIsett + globalDir
+globalGUIPathsFile = globalGUISett + "paths" + setExt
+globalGUISettFile = globalGUISett + "settings" + setExt
+
 testDir = dataProcessorDir + 'DPtest/'
 
 
@@ -51,11 +57,9 @@ testDir = dataProcessorDir + 'DPtest/'
 def getLanCfgFile(lan):
     return text+lan+'/'+lan+'.cfg'
 
-
 # returns language text file path
 def getLanFile(lan, file):
     return text+lan+'/'+file+'.txt'
-
 
 # returns folder where user specific parameter functions files are stored
 def getUserParFunFold(username):
@@ -77,7 +81,7 @@ def getUserHdrFold(username):
 
 
 def getUserHdrFile(username, file):
-    return  getUserHdrFold(username) + file + hdrExt
+    return getUserHdrFold(username) + file + hdrExt
 
 
 def getGlobalHdrFile(file):
@@ -92,6 +96,18 @@ def getUserGraphFile(username, file):
 
 def getGlobalGraphFile(file):
     return globalGraphs + file + grfExt
+
+def getUserGUIFold(username):
+    return GUIsett + username +'/'
+
+def getUserGUIPathFile(username):
+    return getUserGUIFold(username) + "paths" + setExt
+
+def getUserGUISettFile(username):
+    return getUserGUIFold(username) + "settings" + setExt
+
+def checkUserGUIFiles(username):
+    return isfile(getUserGUIPathFile(username)) and isfile(getUserGUISettFile(username))
 
 
 def atof(text):
