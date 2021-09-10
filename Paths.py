@@ -33,6 +33,12 @@ with open(configFilePath) as json_file:
 server = settings['paths']['server']
 text = os.path.join(scriptDir, 'Text/')
 dataProcessorDir = server + 'DataProcessor/'
+downloadPath = server + "Andrej_Mrak/DataProcessor"
+adminFolderPath = server + 'Andrej_Mrak/ProgramData/DataProcessor/'
+permissionFolder = adminFolderPath + 'Permissions/'
+encryptionFolder = adminFolderPath + 'Encryption/'
+newUserRequestsFolder = adminFolderPath + 'UserRequests/'
+usersDatabase = adminFolderPath + 'UsersDatabase/'
 
 globalDir = 'global/'
 
