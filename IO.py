@@ -27,7 +27,6 @@ def transformPDHeader(pdg, headerFile, textObj=None):
             if "headers" in header[parameter]:
                 for file in pdg:
                     for item in pdg[file]:
-                        #print(item.strip(), header[parameter]["headers"], item.strip() in header[parameter]["headers"])
                         if item.strip() in header[parameter]["headers"]:
                             pdg[file] = pdg[file].rename(columns={item: parameter})
             else:

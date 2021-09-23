@@ -146,7 +146,6 @@ class Graph():
 
     def prev(self):
         self.currentIdx -= 1
-        #print('not:', self.currentIdx, self)
 
     def getCurrIdx(self):
         return self.currentIdx

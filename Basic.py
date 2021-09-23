@@ -89,9 +89,7 @@ def loadUserSerFunFile(functionFile, GUIobj=None):
 def getServerFiles(pathArray, ext):
     serverFiles = []
     for path in pathArray:
-        print(path, Paths.isdir(path))
         if Paths.isdir(path):
-            print('a')
             for file in Paths.listdir(path, ext):
                 fileWOExt = file.split('.', 1)[0]
                 if fileWOExt not in serverFiles:
@@ -227,7 +225,6 @@ def lessThan(value, compValue):
 def sortIdx(seq):
     #http://stackoverflow.com/questions/3382352/equivalent-of-numpy-argsort-in-basic-python/3382369#3382369
     #by unutbu
-    #print('a', seq.__getitem__)
     seq = naturalList(seq)
     return sorted(range(len(seq)), key=seq.__getitem__)
 

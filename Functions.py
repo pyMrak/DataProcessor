@@ -278,7 +278,6 @@ class ShiftFunction(SeriesFunction):
     def apply(self, data, fileName='', functionName=''):
         #output = self.SeriesObj()  # {'value': None, 'valid': None}  # initialize output dictionary
         pd = data[fileName]
-        #print('pd:', pd)
         if pd is not None:
             if self.feature1 in pd:  # if feature exists in pd continue
                 #units = data.getUnits(self.feature1)
