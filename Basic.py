@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 from numpy import argsort, array
+import numbers
 
 if os.path.dirname(__file__) == os.getcwd():
     import Paths
@@ -68,18 +69,22 @@ def loadServerFile(serverFile, userLocFun, globalLocFun, err, textObj=None):
         return None
 
 
-def loadUserParFunFile(functionFile, textObj=None):
+def loadUserParFunFile(functionFile, GUIobj=None):
     return loadServerFile(functionFile, Paths.getUserParFunFile, Paths.getGlobalParFunFile,
-                          'parFileNotExists', textObj)
+                          'parFileNotExists', GUIobj)
 
 
-def loadUserHdrFile(headerFile, textObj=None):
+def loadUserHdrFile(headerFile, GUIobj=None):
     return loadServerFile(headerFile, Paths.getUserHdrFile, Paths.getGlobalHdrFile,
-                          'hdrFileNotExists', textObj)
+                          'hdrFileNotExists', GUIobj)
 
 def loadUserGraphFile(graphFile, GUIobj=None):
     return loadServerFile(graphFile, Paths.getUserGraphFile, Paths.getGlobalGraphFile,
-                          'hdrFileNotExists', GUIobj)
+                          'grfFileNotExists', GUIobj)
+
+def loadUserSerFunFile(functionFile, GUIobj=None):
+    return loadServerFile(functionFile, Paths.getUserSerFunFile, Paths.getGlobalSerFunFile,
+                          'serFileNotExists', GUIobj)
 
 def getServerFiles(pathArray, ext):
     serverFiles = []
@@ -108,6 +113,13 @@ def getUserHdrFiles(textObj=None):
         if textObj.username is not None:
             paths.append(Paths.getUserHdrFold(textObj.username))
     return getServerFiles(paths, Paths.hdrExt)
+
+def getUserSerFunFiles(textObj=None):
+    paths = [Paths.globalSerFun]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserSerFunFold(textObj.username))
+    return [""] + getServerFiles(paths, Paths.sfunExt)
 
 def getUserGrfFiles(textObj=None):
     paths = [Paths.globalGraphs]
@@ -151,20 +163,39 @@ def saveUserGUIPresets(settings, paths, textObj=None):
 
 def getGUIMeasPresets(textObj=None):
     settings, paths = loadUserGUIPreset(textObj)
-    return {'folder': paths["dataFolder"],
-            'currViewIdx': 0,
-            'hdrFile': settings["headerFile"],
-            'paramFile': settings["parameterFile"],
-            'grfFile': settings["graphFile"]
-            }
+    defSettings, defPaths = loadUserGUIPreset()
+    guiPreset = {'currViewIdx': 0}
+    for pathName in defPaths:
+        if pathName in paths:
+            guiPreset[pathName] = paths[pathName]
+        else:
+            guiPreset[pathName] = defPaths[pathName]
+    for settName in defSettings:
+        if settName in settings:
+            guiPreset[settName] = settings[settName]
+        else:
+            guiPreset[settName] = defSettings[settName]
+    return guiPreset  # {'folder': paths["dataFolder"],
+    #         'currViewIdx': 0,
+    #         'hdrFile': settings["headerFile"],
+    #         'paramFile': settings["parameterFile"],
+    #         'grfFile': settings["graphFile"],
+    #         'sfunFile': settings["serFunFile"]
+    #         }
 
 def saveGUIMeasUserPreset(presets, textObj=None):
     if textObj is not None:
         settings, paths = loadUserGUIPreset(textObj)
-        settings["headerFile"] = presets['hdrFile']
-        settings["parameterFile"] = presets['paramFile']
-        settings["graphFile"] = presets['grfFile']
-        paths["dataFolder"] = presets['folder']
+        defSettings, defPaths = loadUserGUIPreset()
+        for pathName in defPaths:
+            paths[pathName] = presets[pathName]
+        for settName in defSettings:
+            settings[settName] = presets[settName]
+        # settings["headerFile"] = presets['hdrFile']
+        # settings["parameterFile"] = presets['paramFile']
+        # settings["graphFile"] = presets['grfFile']
+        # paths["dataFolder"] = presets['folder']
+        # paths["serFunFile"] = presets['sfunFile']
         saveUserGUIPresets(settings, paths, textObj)
 
 def atof(text):
@@ -211,6 +242,8 @@ def rearrangeUp(lis):
     else:
         return []
 
+def isNumerical(var):
+    return isinstance(var, numbers.Number)
 
 
 if __name__ == "__main__":

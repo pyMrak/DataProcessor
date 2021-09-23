@@ -2,11 +2,16 @@
 "timeFrmWrong": "Time format in file '{0}' is not readable.",
 "featrNotExist": "Feature '{0}' does not exist in file {1}.",
 "unknParFunType": "Parameter function type '{0}' in parameter '{1}' does not exist.",
-"undfParFunType": "Parameter function type in feature '{0}' not defined",
+"unknSerFunType": "Series function type '{0}' in function '{1}' does not exist.",
+"undfParFunType": "Parameter function type in feature '{0}' is not defined",
+"undfSerFunType": "Series function type in function '{0}' is not defined",
 "undfHdrFeat": "Feature '{0}' in header file '{1}' has no headers defined.",
 "undfHdrFeatUnt": "Feature '{0}' in header file '{1}' has no unit defined.",
 "idxAtInv": "Feature '{1}' does not exist in file '{3}' at index where feature '{0}' is equal to {2}.",
 "valNotReached": "Feature '{0}' in file '{2}' does not reach value {1}.",
-"valNotSet": "Target value for feature '{0}' not set in parameter '{1}'.",
+"tarValNotSet": "Target value for feature '{0}' not set in parameter '{1}'.",
 "graphColEmpty": "Graph color list in graph setting '{0}' is empty.",
-"graphColNotSet": "Graph color list in graph setting '{0}' is not set."}
+"graphColNotSet": "Graph color list in graph setting '{0}' is not set.",
+"funValNotSet": "Value for feature '{0}' not set in function '{1}'.",
+"funValNotNum": "Value for feature '{0}' in function '{1}' is set to {2} and it is not numerical."
+}

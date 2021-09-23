@@ -146,7 +146,7 @@ class AtParFunction(ParameterFunction):
         if pd is not None:
             if self.feature2 in pd:  # if feature1 exists in pd
                 if self.value is not None:  # if value is defined get index of its first occurrence in pd
-                    valueIdx = where(pd[self.feature2] >= self.value)[0]  # TODO implement also for falling values
+                    valueIdx = where(pd[self.feature2] >= self.value)[0]  # TODO implement also for falling values and warning for not numerical values
                     if len(valueIdx) > 0:  # if value reaches threshold
                         valueIdx = valueIdx[0]  # get its first occurrence
                         if self.feature1 in pd:  # if feature1 exists in pd
@@ -160,7 +160,7 @@ class AtParFunction(ParameterFunction):
                     else:
                         self.GUIobj.getWarning('valNotReached', self.feature2, self.value, fileName)
                 else:
-                    self.GUIobj.getWarning('valNotSet', self.feature2, parameter)
+                    self.GUIobj.getWarning('tarValNotSet', self.feature2, parameter)
                 return output
             else:  # if feature does not exist in pd return featrNotExist warning
                 self.GUIobj.getWarning('featrNotExist', self.feature2, fileName)
@@ -221,20 +221,147 @@ class ParameterFunctionGroup(object):
         else:
             self.GUIobj.getError('grpNotParamet', grpName)
             return output
-        
-            
-            
+
+
+
+class SeriesFunction(object):
+
+    def __init__(self, fun, GUIobj=None):
+        self.GUIobj = Texts.getTextObj(GUIobj)
+        funSeries = fun['series']
+        if 'feature1' in funSeries:  # if feature1 is defined in funSeries set its value to self.feature1
+            self.feature1 = funSeries['feature1']
+        else:  # if feature1 is not defined in funSeries set self.feature1 value to None
+            self.feature1 = None
+        if 'feature2' in funSeries:  # if feature2 is defined in funSeries set its value to self.feature2
+            self.feature2 = funSeries['feature2']
+        else:  # if feature2 is not defined in funSeries set self.feature2 value to None
+            self.feature2 = None
+        if 'value' in funSeries:  # if value is defined in funSeries set its value to self.value
+            self.value = funSeries['value']
+        else:  # if value is not defined in funSeries set self.value value to None
+            self.value = None
+        # if 'evaluation' in fun:  # if evaluation is defined in funSeries create Evaluation object from the definition
+        #     self.evaluation = Evaluation(fun['evaluation'], GUIobj=self.GUIobj)
+        # else:  # else create empty Evaluation object
+        #     self.evaluation = Evaluation()
+        # if 'rounding' in funSeries:  # if rounding is defined in funSeries
+        #     if type(funSeries['rounding']) == int:  # if rounding type is integer set the value from funSeries
+        #         self.rounding = funSeries['rounding']
+        #     else:
+        #         try:  # if rounding type is not integer try to convert funSeries value to integer type
+        #             self.rounding = int(funSeries['rounding'])
+        #         except:  # if conversion fails set roundding value to None
+        #             self.rounding = None
+        # else:  # if rounding is not defined set it as None
+        #     self.rounding = None
+
+    def groupApply(self, groupPd, parameter=''):
+        for fileName in groupPd:  # iterate trough file names in groupPd
+            self.apply(groupPd, fileName, parameter)  # get function values for given file
+            self.GUIobj.moveErrorsToWarnings()  # if error occurs append it to warnings
+
+    # def getParameter(self, value, evaluate, units):
+    #     parameter = self.SeriesObj(value)
+    #     parameter.setRounding(self.rounding)
+    #     parameter.setUnits(units)
+    #     if evaluate:  # if evaluation is wanted evaluate function value
+    #         parameter.setValid(self.evaluation.validate(parameter))
+    #     return parameter
+
+
+class ShiftFunction(SeriesFunction):
+
+    def __init__(self, funSer, GUIobj=None):
+        SeriesFunction.__init__(self, funSer, GUIobj)
+
+    def apply(self, data, fileName='', functionName=''):
+        #output = self.SeriesObj()  # {'value': None, 'valid': None}  # initialize output dictionary
+        pd = data[fileName]
+        #print('pd:', pd)
+        if pd is not None:
+            if self.feature1 in pd:  # if feature exists in pd continue
+                #units = data.getUnits(self.feature1)
+                if self.value is not None:  # if value for the shift is defined continue
+                    if Basic.isNumerical(self.value):  # if value for the shift is numerical shift feature
+                        pd[self.feature1] += self.value
+                    else:  # if value for the shift is not numerical raise warning
+                        self.GUIobj.getWarning('funValNotNum', self.feature1, functionName, self.value)
+                else:    # if value for the shift is not defined raise warning
+                    self.GUIobj.getWarning('funValNotSet', self.feature1, functionName)
+            else:  # if feature does not exist in pd return featrNotExist warning
+                self.GUIobj.getWarning('featrNotExist', self.feature1, fileName)
+        else:
+            self.GUIobj.getError('fileNotShift', self.feature1, fileName)
+
+
+
+class SeriesFunctionGroup(object):
+
+    functionTypes = {"shift": ShiftFunction,
+                     }
+
+    def __init__(self, GUIobj=None):
+        self.functions = {}
+        self.GUIobj = Texts.getTextObj(GUIobj)  # if GUI object is not given (user sets language) use english GUI object
+        self.functionFile = None
+        # self.username = username
+
+    def load(self, functionFile):
+        self.functionFile = functionFile
+        parFun = Basic.loadUserSerFunFile(self.functionFile, self.GUIobj)
+        if parFun is not None:
+            return self.parseFunctions(parFun)
+
+    #        if self.username is not None:
+    #            userParFunFile = Paths.getUserParFunFile(self.username, functionFile)
+    #            if Paths.isfile(userParFunFile):
+    #                parFun = Basic.loadJsonFile(userParFunFile)
+    #                out, warnings, errors = self.parseFunctions(parFun, textObj)
+    #                return out, warnings, errors
+    #        globalParFunFile = Paths.getGlobalParFunFile(functionFile)
+    #        if Paths.isfile(globalParFunFile):
+    #            parFun = Basic.loadJsonFile(globalParFunFile)
+    #            out, warnings, errors = self.parseFunctions(parFun, textObj)
+    #            return out, warnings, errors
+
+    def parseFunctions(self, parFun):
+        for sFunction in parFun:
+            if 'function' in parFun[sFunction]:
+                functionType = parFun[sFunction]['function']
+                if functionType in self.functionTypes:
+                    self.functions[sFunction] = self.functionTypes[functionType](parFun[sFunction],
+                                                                                 self.GUIobj)
+                else:
+                    self.GUIobj.getWarning('unknSerFunType', functionType, sFunction)
+            else:
+                self.GUIobj.getWarning('undfSerFunType', sFunction)
+
+    def apply(self, groupPd, grpName=''):
+        output = {}
+        if groupPd is not None:
+            for sFunction in self.functions:
+                output[sFunction] = self.functions[sFunction].groupApply(groupPd, sFunction)
+            return output
+        else:
+            self.GUIobj.getError('grpNotSeries', grpName)
+            return output
+
+
                     
                 
 
 if __name__ == "__main__":
-    from IO import readPyroDir, transformPDHeader
-    out = readPyroDir(Paths.testDir)
-    out = transformPDHeader(out, 'functionalLab')
-    pfg = ParameterFunctionGroup()
-    pfg.load('5011-721-414-QC')
-    parOut = pfg.get(out)
-    print(parOut)
+    from Data import DataGroup
+    data = DataGroup()
+    data.setFolder(Paths.testDir)
+    data.readPyro('functionalLab')
+    sfg = SeriesFunctionGroup()
+    sfg.load('5011-721-414')
+    sfg.apply(data)
+    data.getParameters('5011-721-414-QC')
+
+    print(data._parameters)
 #    funPar = Basic.loadJsonFile(Paths.getGlobalParFunFile('5011-721-414-QC'))
 #    maxFun = MaxParFunction(funPar['Tmax'])
 #    par, war, err = maxFun.groupGet(out)

@@ -20,6 +20,7 @@ configFilePath = os.path.join(scriptDir, configFile)
 
 #  extensions
 pfunExt = '.pfun'
+sfunExt = '.sfun'
 hdrExt = '.hdr'
 grfExt = '.grf'
 setExt = '.set'
@@ -44,6 +45,9 @@ globalDir = 'global/'
 
 parameterFunctions = dataProcessorDir + 'ParameterFunctions/'
 globalParFun = parameterFunctions + globalDir
+
+seriesFunctions = dataProcessorDir + 'SeriesFunctions/'
+globalSerFun = seriesFunctions + globalDir
 
 headers = dataProcessorDir + 'Headers/'
 globalHeaders = headers + globalDir
@@ -80,6 +84,19 @@ def getUserParFunFile(username, file):
 # return parameter global function file
 def getGlobalParFunFile(file):
     return globalParFun + file + pfunExt
+
+
+# returns folder where user specific parameter functions files are stored
+def getUserSerFunFold(username):
+    return seriesFunctions + username + '/'
+
+# return parameter function file of an user
+def getUserSerFunFile(username, file):
+    return getUserSerFunFold(username) + file + sfunExt
+
+# return series function global function file
+def getGlobalSerFunFile(file):
+    return globalSerFun + file + sfunExt
 
 
 def getUserHdrFold(username):

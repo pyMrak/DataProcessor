@@ -2,10 +2,14 @@
 "dirNotExists": "Folder '{0}' is not available or it does not exist.",
 "fileNotExists": "File '{0}' is not available or it does not exist.",
 "parFileNotExists": "Parameter file '{0}' is not available or it does not exist.",
-"hdrFileNotExists": "Header file '{0}' is not available or it does not exist.", 
+"hdrFileNotExists": "Header file '{0}' is not available or it does not exist.",
+"grfFileNotExists": "Graph file '{0}' is not available or it does not exist.",
+"serFileNotExists": "Series function file '{0}' is not available or it does not exist.",
 "fileNotParamet": "File {0} is not parameterizable.",
 "grpNotParamet": "Group {0} is not parameterizable.",
 "jsonNotReadable": "Json file {0} not readable.",
 "lineGXNotSet": "X axis for '{0}' line graph not set.",
-"lineGXNotPres": "Entity {0} for X axis not present in file '{1}'"
+"lineGXNotPres": "Entity '{0}' for X axis not present in file '{1}'",
+"fileNotShift": "Entity '{0}' in file '{1}' cannot be shifted.",
+"grpNotSeries": "Group '{0}' does not contain any series."
 }

@@ -13,13 +13,13 @@ if os.path.dirname(__file__) == os.getcwd():
     import IO
     import Basic
     import Texts
-    from Functions import ParameterFunctionGroup
+    from Functions import ParameterFunctionGroup, SeriesFunctionGroup
 else:
     from . import Paths
     from . import IO
     from . import Basic
     from . import Texts
-    from .Functions import ParameterFunctionGroup
+    from .Functions import ParameterFunctionGroup, SeriesFunctionGroup
 #from GUI import GUIfunObj
 
 class Data(object):
@@ -28,6 +28,7 @@ class Data(object):
         self.groupDir = fileName
         self.data = data
         self.units = {}
+        self.seriesFun = []
         
     def __set__(self, instance, value):
         self.data = value
@@ -38,7 +39,7 @@ class Data(object):
     def __setitem__(self, key, value):
         if key in self.data:
             self.data[key] = value
-        if key == 'units':
+        elif key == 'units':
             self.units = value
         else:
             raise KeyError(key)
@@ -62,6 +63,10 @@ class Data(object):
 
     def shape(self):
         return self.data.shape
+
+    # def setSerFunction(self, function):
+    #     self.seriesFun.append(function)
+    #
 
 class Parameters(object):
 
@@ -207,6 +212,7 @@ class DataGroup(object):
         self._data = {}
         self._units = {}
         self._parameters = Parameters(self.groupDir, self.GUIobj)
+        self._serFunctionGroup = SeriesFunctionGroup()
 
     def __set__(self, instance, value):
         self._data = value
@@ -278,6 +284,10 @@ class DataGroup(object):
 
     def getParameters(self, functionFile=None):
         self._parameters.getParameters(self, functionFile)
+
+    def applySerFunctions(self, functionFile=None):
+        self._serFunctionGroup.load(functionFile)
+        self._serFunctionGroup.apply(self._data)
 
     def getUnits(self, parameter):
         if parameter in self._units:
