@@ -7,7 +7,7 @@ Created on Thu Jan  7 10:10:03 2021
 import json
 import re
 import os
-from os.path import isdir, isfile
+from os.path import isdir, isfile, join
 
 import os
 
@@ -16,7 +16,7 @@ scriptDir = os.path.dirname(__file__) #<-- absolute dir the script is in
 
 # Special files
 configFile = 'settings.cfg'
-configFilePath = os.path.join(scriptDir, configFile)
+#configFilePath = os.path.join(scriptDir, configFile)
 
 #  extensions
 pfunExt = '.pfun'
@@ -27,14 +27,15 @@ setExt = '.set'
 
 
 # loads application settings file
-with open(configFilePath) as json_file:
+with open(configFile) as json_file:
     settings = json.load(json_file)
 
 # Folders
 server = settings['paths']['server']
 text = os.path.join(scriptDir, 'Text/')
 dataProcessorDir = server + 'DataProcessor/'
-downloadPath = server + "Andrej_Mrak/DataProcessor"
+downloadPath = server + "Andrej_Mrak/DataProcessor/"
+sourcePath = downloadPath + "DataProcessor/"
 adminFolderPath = server + 'Andrej_Mrak/ProgramData/DataProcessor/'
 permissionFolder = adminFolderPath + 'Permissions/'
 encryptionFolder = adminFolderPath + 'Encryption/'
