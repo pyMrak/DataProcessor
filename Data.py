@@ -147,7 +147,7 @@ class Parameter(object):
         valStr = ''
         untStr = ''
         if self.value is not None:
-            valStr = str(round(self.value, self.rounding)).replace('.', ',')
+            valStr = ("{:."+str(self.rounding)+"f}").format(self.value).replace('.', ',')
             if self.units is not None:
                 untStr = str(self.units)
         return valStr #+ untStr
