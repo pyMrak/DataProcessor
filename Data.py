@@ -42,7 +42,8 @@ class Data(object):
         elif key == 'units':
             self.units = value
         else:
-            raise KeyError(key)
+            self.data[key] = value
+            #raise KeyError(key)
         
     def __getitem__(self, key):
         if key in self.data:
@@ -212,7 +213,7 @@ class DataGroup(object):
         self._data = {}
         self._units = {}
         self._parameters = Parameters(self.groupDir, self.GUIobj)
-        self._serFunctionGroup = SeriesFunctionGroup()
+        self._serFunctionGroup = SeriesFunctionGroup(self.GUIobj)
 
     def __set__(self, instance, value):
         self._data = value

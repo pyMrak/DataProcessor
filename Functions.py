@@ -252,7 +252,11 @@ class SeriesFunction(object):
             self.value1 = funSeries['value1']
         else:  # if value is not defined in funSeries set self.value value to None
             self.value1 = None
-        # if 'evaluation' in fun:  # if evaluation is defined in funSeries create Evaluation object from the definition
+        if "newName" in funSeries:
+            self.newName = funSeries["newName"]
+        else:
+            self.newName = self.feature1
+            # if 'evaluation' in fun:  # if evaluation is defined in funSeries create Evaluation object from the definition
         #     self.evaluation = Evaluation(fun['evaluation'], GUIobj=self.GUIobj)
         # else:  # else create empty Evaluation object
         #     self.evaluation = Evaluation()
@@ -298,7 +302,7 @@ class ShiftFunction(SeriesFunction):
                 #units = data.getUnits(self.feature1)
                 if self.value1 is not None:  # if value for the shift is defined continue
                     if Basic.isNumerical(self.value1):  # if value for the shift is numerical shift feature
-                        pd[self.feature1] += self.value1
+                        pd[self.newName] = pd[self.feature1] + self.value1
                     else:  # if value for the shift is not numerical raise warning
                         self.GUIobj.getWarning('funValNotNum', self.feature1, functionName, self.value1)
                 else:    # if value for the shift is not defined raise warning
