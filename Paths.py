@@ -31,7 +31,10 @@ with open(configFile) as json_file:
     settings = json.load(json_file)
 
 # Folders
-server = settings['paths']['server']
+if os.path.exists(settings['paths']['server']):
+    server = settings['paths']['server']
+else:
+    server = settings['paths']['remote_server']
 text = os.path.join(scriptDir, 'Text/')
 dataProcessorDir = server + 'DataProcessor/'
 downloadPath = server + "Andrej_Mrak/DataProcessor/"

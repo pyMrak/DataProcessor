@@ -32,10 +32,10 @@ class ParameterFunction(object):
             self.feature2 = funParam['feature2']
         else:  # if feature2 is not defined in funParam set self.feature2 value to None
             self.feature2 = None
-        if 'value' in funParam:  # if value is defined in funParam set its value to self.value
-            self.value = funParam['value']
+        if 'value2' in funParam:  # if value is defined in funParam set its value to self.value
+            self.value2 = funParam['value2']
         else:  # if value is not defined in funParam set self.value value to None
-            self.value = None
+            self.value2 = None
         if 'evaluation' in fun:  # if evaluation is defined in funParam create Evaluation object from the definition
             self.evaluation = Evaluation(fun['evaluation'], GUIobj=self.GUIobj)
         else:  # else create empty Evaluation object
@@ -97,6 +97,9 @@ class Evaluation(object):
     
     
 class MaxParFunction(ParameterFunction):
+
+    mandatorySett = ["feature1",
+                     ]
     
     def __init__(self, funParam, ParameterObj=None, GUIobj=None):
         ParameterFunction.__init__(self, funParam, ParameterObj, GUIobj)
@@ -118,6 +121,9 @@ class MaxParFunction(ParameterFunction):
 
 class MinParFunction(ParameterFunction):
 
+    mandatorySett = ["feature1",
+                     ]
+
     def __init__(self, funParam, ParameterObj=None, GUIobj=None):
         ParameterFunction.__init__(self, funParam, ParameterObj, GUIobj)
 
@@ -137,6 +143,11 @@ class MinParFunction(ParameterFunction):
 
 class AtParFunction(ParameterFunction):
 
+    mandatorySett = ["feature1",
+                     "feature2",
+                     "value2"
+                     ]
+
     def __init__(self, funParam, ParameterObj=None, GUIobj=None):
         ParameterFunction.__init__(self, funParam, ParameterObj, GUIobj)
 
@@ -145,8 +156,8 @@ class AtParFunction(ParameterFunction):
         pd = data[fileName]
         if pd is not None:
             if self.feature2 in pd:  # if feature1 exists in pd
-                if self.value is not None:  # if value is defined get index of its first occurrence in pd
-                    valueIdx = where(pd[self.feature2] >= self.value)[0]  # TODO implement also for falling values and warning for not numerical values
+                if self.value2 is not None:  # if value is defined get index of its first occurrence in pd
+                    valueIdx = where(pd[self.feature2] >= self.value2)[0]  # TODO implement also for falling values and warning for not numerical values
                     if len(valueIdx) > 0:  # if value reaches threshold
                         valueIdx = valueIdx[0]  # get its first occurrence
                         if self.feature1 in pd:  # if feature1 exists in pd
@@ -154,11 +165,11 @@ class AtParFunction(ParameterFunction):
                                 units = data.getUnits(self.feature1)
                                 output = self.getParameter(pd[self.feature1][valueIdx], evaluate, units)
                             else:  #
-                                self.GUIobj.getWarning('idxAtInv', self.feature1, self.feature2, self.value, fileName)
+                                self.GUIobj.getWarning('idxAtInv', self.feature1, self.feature2, self.value2, fileName)
                         else:
                             self.GUIobj.getWarning('featrNotExist', self.feature1, fileName)
                     else:
-                        self.GUIobj.getWarning('valNotReached', self.feature2, self.value, fileName)
+                        self.GUIobj.getWarning('valNotReached', self.feature2, self.value2, fileName)
                 else:
                     self.GUIobj.getWarning('tarValNotSet', self.feature2, parameter)
                 return output
@@ -228,7 +239,7 @@ class SeriesFunction(object):
 
     def __init__(self, fun, GUIobj=None):
         self.GUIobj = Texts.getTextObj(GUIobj)
-        funSeries = fun['series']
+        funSeries = fun['parameters']
         if 'feature1' in funSeries:  # if feature1 is defined in funSeries set its value to self.feature1
             self.feature1 = funSeries['feature1']
         else:  # if feature1 is not defined in funSeries set self.feature1 value to None
@@ -237,10 +248,10 @@ class SeriesFunction(object):
             self.feature2 = funSeries['feature2']
         else:  # if feature2 is not defined in funSeries set self.feature2 value to None
             self.feature2 = None
-        if 'value' in funSeries:  # if value is defined in funSeries set its value to self.value
-            self.value = funSeries['value']
+        if 'value1' in funSeries:  # if value is defined in funSeries set its value to self.value
+            self.value1 = funSeries['value1']
         else:  # if value is not defined in funSeries set self.value value to None
-            self.value = None
+            self.value1 = None
         # if 'evaluation' in fun:  # if evaluation is defined in funSeries create Evaluation object from the definition
         #     self.evaluation = Evaluation(fun['evaluation'], GUIobj=self.GUIobj)
         # else:  # else create empty Evaluation object
@@ -272,6 +283,10 @@ class SeriesFunction(object):
 
 class ShiftFunction(SeriesFunction):
 
+    mandatorySett = ["feature1",
+                     "value1",
+                     ]
+
     def __init__(self, funSer, GUIobj=None):
         SeriesFunction.__init__(self, funSer, GUIobj)
 
@@ -281,11 +296,11 @@ class ShiftFunction(SeriesFunction):
         if pd is not None:
             if self.feature1 in pd:  # if feature exists in pd continue
                 #units = data.getUnits(self.feature1)
-                if self.value is not None:  # if value for the shift is defined continue
-                    if Basic.isNumerical(self.value):  # if value for the shift is numerical shift feature
-                        pd[self.feature1] += self.value
+                if self.value1 is not None:  # if value for the shift is defined continue
+                    if Basic.isNumerical(self.value1):  # if value for the shift is numerical shift feature
+                        pd[self.feature1] += self.value1
                     else:  # if value for the shift is not numerical raise warning
-                        self.GUIobj.getWarning('funValNotNum', self.feature1, functionName, self.value)
+                        self.GUIobj.getWarning('funValNotNum', self.feature1, functionName, self.value1)
                 else:    # if value for the shift is not defined raise warning
                     self.GUIobj.getWarning('funValNotSet', self.feature1, functionName)
             else:  # if feature does not exist in pd return featrNotExist warning

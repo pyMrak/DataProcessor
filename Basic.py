@@ -68,6 +68,13 @@ def loadServerFile(serverFile, userLocFun, globalLocFun, err, textObj=None):
             textObj.getError(err, globalFile)
         return None
 
+# creates user folders for new users
+def initiateUserFolders(username):
+    for folder in (Paths.headers, Paths.parameterFunctions, Paths.seriesFunctions, Paths.graphs):
+        userFolder = folder + username + '/'
+        if not Paths.isdir(userFolder):
+            os.mkdir(userFolder)
+
 
 def loadUserParFunFile(functionFile, GUIobj=None):
     return loadServerFile(functionFile, Paths.getUserParFunFile, Paths.getGlobalParFunFile,
@@ -241,6 +248,13 @@ def rearrangeUp(lis):
 
 def isNumerical(var):
     return isinstance(var, numbers.Number)
+
+def isNumericalText(var):
+    try:
+        float(var)
+        return True
+    except ValueError:
+        return False
 
 
 if __name__ == "__main__":
