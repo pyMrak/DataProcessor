@@ -98,6 +98,9 @@ class Parameters(object):
         else:
             return [].__iter__()
 
+    def __len__(self):
+        return len(self.df.columns)#list(self.df.__iter__()))
+
     def setGrpName(self, name):
         self.groupName = name
 

@@ -64,7 +64,7 @@ globalGUISett = GUIsett + globalDir
 globalGUIPathsFile = globalGUISett + "paths" + setExt
 globalGUISettFile = globalGUISett + "settings" + setExt
 
-testDir = dataProcessorDir + 'DPtest/'
+testDir = 'DPtest/' #dataProcessorDir + 'DPtest/' TODO pobriši
 
 
 # returns language configuration file path
