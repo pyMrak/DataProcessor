@@ -3,6 +3,7 @@ from numpy import array
 import os
 plt.rcParams['toolbar'] = 'toolmanager'
 from matplotlib.backend_tools import ToolBase
+from io import BytesIO
 
 if os.path.dirname(__file__) == os.getcwd():
     import Basic
@@ -68,6 +69,9 @@ class MatplotlibObject():
 
     def addYAxis(self):
         self.ax2 = self.ax.twinx()
+
+    def changeSize(self, size):
+        self.figure.set_size_inches(*size)
 
 
 
@@ -143,9 +147,15 @@ class Graph():
 
     def next(self):
         self.currentIdx += 1
+        if self.currentIdx == len(self.dgObj) - 1:
+            return False
+        return True
 
     def prev(self):
         self.currentIdx -= 1
+        if self.currentIdx == 0:
+            return False
+        return True
 
     def getCurrIdx(self):
         return self.currentIdx
@@ -164,10 +174,11 @@ class LineGraph(Graph):
         Graph.__init__(self, graphSettings=graphSettings, GUIobj=GUIobj, mlObj=mlObj, currIdx=currIdx)
 
 
-    def draw(self, dgObj=None, draw=True):
-
+    def draw(self, dgObj=None, draw=True, size=None):
         if dgObj is not None:
             self.dgObj = dgObj
+        if size is not None:
+            self.mlObj.changeSize(size)
         if self.dgObj is not None:
             if self.dgObj.isDefined():
                 xAxis = None
@@ -237,6 +248,10 @@ class LineGraph(Graph):
                 self.mlObj.format()
                 if draw:
                     self.mlObj.draw()
+                else:
+                    b = BytesIO()
+                    plt.savefig(b, format='png')
+                    return b
             else:
                 if self.mlObj.ax2 is not None:
                     self.mlObj.ax2.clear()
@@ -244,6 +259,10 @@ class LineGraph(Graph):
                 self.mlObj.format()
                 if draw:
                     self.mlObj.draw()
+                else:
+                    b = BytesIO()
+                    plt.savefig(b, format='png')
+                    return b
 
 
 

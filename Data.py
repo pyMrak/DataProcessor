@@ -242,6 +242,9 @@ class DataGroup(object):
     def __iter__(self):
         return self._data.__iter__()
 
+    def __len__(self):
+        return len(self._data)
+
     def setFolder(self, folder):
         self.groupDir = folder
         self._parameters.setGrpName(folder)

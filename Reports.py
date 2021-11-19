@@ -1,8 +1,11 @@
 from openpyxl.styles import Font, Fill, PatternFill, NamedStyle, Border, Side
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl.drawing.image import Image
+
 
 import Paths
+import Graph
 
 class ExcelWorkbook(Workbook):
 
@@ -24,6 +27,7 @@ class ExcelWorkbook(Workbook):
     def save(self, filename, *args, **kwargs):
         for worksheet in self.worksheets:
             worksheet.insert(*args, **kwargs)
+        self.active = 0
         super().save(filename)
 
 class ExcelWorksheet(Worksheet):
@@ -49,8 +53,8 @@ class ExcelBlock(object):
 
     badVal = NamedStyle(name="bad")
     goodVal = NamedStyle(name="good")
-    badVal.fill = PatternFill("solid", fgColor="eb7373")
-    goodVal.fill = PatternFill("solid", fgColor="6fc9c9")
+    badVal.fill = PatternFill("solid", fgColor="ff8585")
+    goodVal.fill = PatternFill("solid", fgColor="7beded")
     bd = Side(style='thin', color="000000")
     badVal.border = Border(left=bd, top=bd, right=bd, bottom=bd)
     goodVal.border = Border(left=bd, top=bd, right=bd, bottom=bd)
@@ -93,6 +97,19 @@ class ExcelBlock(object):
                 return [endPosition[0],
                         kwargs["occupied"][1] + endPosition[1]]
 
+    def getAnchor(self, column, row):
+        leftOver = column+1
+        chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        charsLen = len(chars)
+        anchor = str(row+1)
+        while leftOver > 0:
+            mod = leftOver % charsLen
+            char = chars[mod-1]
+            leftOver = int((leftOver - mod)/charsLen)
+            anchor = char + anchor
+        return anchor
+
+
 
 class ExcelPictureList(ExcelBlock):
 
@@ -108,8 +125,6 @@ class ExcelPictureList(ExcelBlock):
 
 
 class ExcelParameterTable(ExcelBlock):
-
-
 
     def __init__(self, position=None, direction=0):
         self.dataGroup = 0
@@ -158,6 +173,47 @@ class ExcelParameterTable(ExcelBlock):
         return self.getOccupied([0, 0], **kwargs)
 
 
+class ExcelGraphList(ExcelBlock):
+    graphSize = (19.20, 7.6)
+
+    def __init__(self, graphFile, position=None, direction=0):
+        self.setGraphFile(graphFile)
+        self.dataGroup = 0
+        ExcelBlock.__init__(self, position, direction)
+
+    def setGraphFile(self, graphFile):
+        self._gw = Graph.GraphWrapper(graphFile)
+
+    def setDataGroup(self, dg):
+        self.dataGroup = dg
+
+    def getGraphs(self, *args, **kwargs):
+        graphs = []
+        if "groups" in kwargs:
+            dg = kwargs["groups"][self.dataGroup]
+            cont = True
+            graphs.append(self._gw.graph.draw(dg, draw=False, size=self.graphSize))
+            while cont:
+                cont = self._gw.graph.next()
+                graphs.append(self._gw.graph.draw(dg, draw=False, size=self.graphSize))
+        return graphs
+
+
+    def insert(self, *args, **kwargs):
+        if self.getPosition(*args, **kwargs) and "groups" in kwargs:
+            if "listDown" in kwargs:
+                listDown= kwargs["listDirection"]
+            else:
+                listDown = False
+            graphs = self.getGraphs(*args, **kwargs)
+            for i, graph in enumerate(graphs):
+                img = Image(graph)
+                img.anchor = self.getAnchor(self.position[0]+i*30*(not listDown),
+                                            self.position[1]+i*38*listDown)
+                self.worksheet.add_image(img)
+            return self.getOccupied([self.position[0]+i*30*(not listDown)+30,
+                                     self.position[1]+i*38*listDown+38], **kwargs)
+        return self.getOccupied([0, 0], **kwargs)
 
 
 
@@ -171,9 +227,13 @@ if __name__ == "__main__":
 
     wb = ExcelWorkbook()
     wb.setSheetTitle("Parametri")
-    wb.adBlock(ExcelParameterTable([2, 3]))
-    wb.adBlock(ExcelParameterTable([2, 3], 1))
-    wb.adBlock(ExcelParameterTable([2, 3], 0))
+    #wb.adBlock(ExcelParameterTable([2, 3]))
+
+    # wb.create_sheet("Grafi")
+    # wb.active = 1
+    wb.adBlock(ExcelGraphList('functionalGP', [2, 3], 0))
+    wb.adBlock(ExcelParameterTable([1, 1], 0))
+    # wb.adBlock(ExcelParameterTable([2, 3], 0))
 
 
     data = DataGroup()
@@ -185,4 +245,7 @@ if __name__ == "__main__":
     data.getParameters('5011-721-414-QC')
 
     wb.save("test.xlsx", groups=[data])
+    # eg = ExcelGraph('functionalGP', [2, 3], 0)
+    # print(eg.getAnchor(27, 5))
+
 
