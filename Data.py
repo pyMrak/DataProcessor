@@ -213,10 +213,8 @@ class DataGroup(object):
         # if GUI object is not given (user sets language) use english Text object
         self.GUIobj = Texts.getTextObj(GUIobj)
 
-        self._data = {}
-        self._units = {}
-        self._parameters = Parameters(self.groupDir, self.GUIobj)
         self._serFunctionGroup = SeriesFunctionGroup(self.GUIobj)
+        self.reset()
 
     def __set__(self, instance, value):
         self._data = value
@@ -244,6 +242,11 @@ class DataGroup(object):
 
     def __len__(self):
         return len(self._data)
+
+    def reset(self):
+        self._data = {}
+        self._units = {}
+        self._parameters = Parameters(self.groupDir, self.GUIobj)
 
     def setFolder(self, folder):
         self.groupDir = folder
@@ -322,5 +325,6 @@ if __name__ == "__main__":
     pdg.readPyro('functionalLab')
     pdg.getParameters('5011-721-414-QC')
     print(type(pdg['parameters']))
+    print(pdg._parameters)
     for d in pdg[0]:
         print('line:', d)
