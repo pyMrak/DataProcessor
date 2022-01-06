@@ -24,6 +24,8 @@ sfunExt = '.sfun'
 hdrExt = '.hdr'
 grfExt = '.grf'
 setExt = '.set'
+erpExt = '.erp'
+etmExt = '.xlsx'
 
 
 # loads application settings file
@@ -63,6 +65,12 @@ GUIsett = dataProcessorDir + "GUI/"
 globalGUISett = GUIsett + globalDir
 globalGUIPathsFile = globalGUISett + "paths" + setExt
 globalGUISettFile = globalGUISett + "settings" + setExt
+
+reportsDir = dataProcessorDir + "Reports/"
+excelReportsDir = reportsDir + "Excel/Reports/"
+excelTemplatesDir = reportsDir + "Excel/Templates/"
+globalExcelReportsDir = excelReportsDir + globalDir
+globalExcelTemplatesDir = excelTemplatesDir + globalDir
 
 testDir = 'DPtest/' #dataProcessorDir + 'DPtest/' TODO pobriši
 
@@ -110,7 +118,6 @@ def getUserHdrFold(username):
 def getUserHdrFile(username, file):
     return getUserHdrFold(username) + file + hdrExt
 
-
 def getGlobalHdrFile(file):
     return globalHeaders + file + hdrExt
 
@@ -132,6 +139,24 @@ def getUserGUIPathFile(username):
 
 def getUserGUISettFile(username):
     return getUserGUIFold(username) + "settings" + setExt
+
+def getUserExcelReportsFold(username):
+    return excelReportsDir + username + "/"
+
+def getUserExcelTemplatesFold(username):
+    return excelTemplatesDir + username + "/"
+
+def getGlobalExcelReportFile(file):
+    return globalExcelReportsDir + file + erpExt
+
+def getGlobalExcelTemplateFile(file):
+    return globalExcelTemplatesDir + file + etmExt
+
+def getUserExcelReportFile(username, file):
+    return getUserExcelReportsFold(username) + file + erpExt
+
+def getUserExcelTemplateFile(username, file):
+    return getUserExcelTemplatesFold(username) + file + etmExt
 
 def checkUserGUIFiles(username):
     return isfile(getUserGUIPathFile(username)) and isfile(getUserGUISettFile(username))

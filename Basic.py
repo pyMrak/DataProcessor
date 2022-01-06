@@ -93,6 +93,10 @@ def loadUserSerFunFile(functionFile, GUIobj=None):
     return loadServerFile(functionFile, Paths.getUserSerFunFile, Paths.getGlobalSerFunFile,
                           'serFileNotExists', GUIobj)
 
+def loadUserExcReportFile(functionFile, GUIobj=None):
+    return loadServerFile(functionFile, Paths.getUserExcelReportFile, Paths.getGlobalExcelReportFile,
+                          'serFileNotExists', GUIobj)
+
 def getServerFiles(pathArray, ext):
     serverFiles = []
     for path in pathArray:
@@ -132,6 +136,20 @@ def getUserGrfFiles(textObj=None):
         if textObj.username is not None:
             paths.append(Paths.getUserGraphFold(textObj.username))
     return getServerFiles(paths, Paths.grfExt)
+
+def getUserExcelReportFiles(textObj=None):
+    paths = [Paths.globalExcelReportsDir]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserExcelReportsFold(textObj.username))
+    return getServerFiles(paths, Paths.erpExt)
+
+def getUserExcelTemplateFiles(textObj=None):
+    paths = [Paths.globalExcelReportsDir]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserExcelTemplatesFold(textObj.username))
+    return getServerFiles(paths, Paths.etmExt)
 
 def getUserGUIFiles(textObj=None):
     if textObj is None:

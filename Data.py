@@ -6,6 +6,7 @@ Created on Wed Jan 13 08:49:06 2021
 """
 
 from pandas import DataFrame
+from pathlib import Path
 import os
 
 if os.path.dirname(__file__) == os.getcwd():
@@ -251,6 +252,12 @@ class DataGroup(object):
     def setFolder(self, folder):
         self.groupDir = folder
         self._parameters.setGrpName(folder)
+
+    def getFolder(self):
+        return Path(self.groupDir).parent
+
+    def getPath(self):
+        return self.groupDir
         
     def dirExists(self):
         if self.groupDir is not None:
