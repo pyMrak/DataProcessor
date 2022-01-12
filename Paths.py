@@ -26,6 +26,8 @@ grfExt = '.grf'
 setExt = '.set'
 erpExt = '.erp'
 etmExt = '.xlsx'
+wrpExt = '.wrp'
+wtmExt = '.docx'
 
 
 # loads application settings file
@@ -71,6 +73,10 @@ excelReportsDir = reportsDir + "Excel/Reports/"
 excelTemplatesDir = reportsDir + "Excel/Templates/"
 globalExcelReportsDir = excelReportsDir + globalDir
 globalExcelTemplatesDir = excelTemplatesDir + globalDir
+wordReportsDir = reportsDir + "Word/Reports/"
+wordTemplatesDir = reportsDir + "Word/Templates/"
+globalWordReportsDir = wordReportsDir + globalDir
+globalWordTemplatesDir = wordTemplatesDir + globalDir
 
 testDir = 'DPtest/' #dataProcessorDir + 'DPtest/' TODO pobriši
 
@@ -157,6 +163,24 @@ def getUserExcelReportFile(username, file):
 
 def getUserExcelTemplateFile(username, file):
     return getUserExcelTemplatesFold(username) + file + etmExt
+
+def getUserWordReportsFold(username):
+    return wordReportsDir + username + "/"
+
+def getUserWordTemplatesFold(username):
+    return wordTemplatesDir + username + "/"
+
+def getGlobalWordReportFile(file):
+    return globalWordReportsDir + file + wrpExt
+
+def getGlobalWordTemplateFile(file):
+    return globalWordTemplatesDir + file + wtmExt
+
+def getUserWordReportFile(username, file):
+    return getUserWordReportsFold(username) + file + wrpExt
+
+def getUserWordTemplateFile(username, file):
+    return getUserWordTemplatesFold(username) + file + wtmExt
 
 def checkUserGUIFiles(username):
     return isfile(getUserGUIPathFile(username)) and isfile(getUserGUISettFile(username))

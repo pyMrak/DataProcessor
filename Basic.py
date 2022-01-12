@@ -97,6 +97,10 @@ def loadUserExcReportFile(functionFile, GUIobj=None):
     return loadServerFile(functionFile, Paths.getUserExcelReportFile, Paths.getGlobalExcelReportFile,
                           'serFileNotExists', GUIobj)
 
+def loadUserWordReportFile(functionFile, GUIobj=None):
+    return loadServerFile(functionFile, Paths.getUserWordReportFile, Paths.getGlobalWordReportFile,
+                          'serFileNotExists', GUIobj)
+
 def getServerFiles(pathArray, ext):
     serverFiles = []
     for path in pathArray:
@@ -150,6 +154,20 @@ def getUserExcelTemplateFiles(textObj=None):
         if textObj.username is not None:
             paths.append(Paths.getUserExcelTemplatesFold(textObj.username))
     return getServerFiles(paths, Paths.etmExt)
+
+def getUserWordReportFiles(textObj=None):
+    paths = [Paths.globalWordReportsDir]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserWordReportsFold(textObj.username))
+    return getServerFiles(paths, Paths.wrpExt)
+
+def getUserWordTemplateFiles(textObj=None):
+    paths = [Paths.globalWordReportsDir]
+    if textObj is not None:
+        if textObj.username is not None:
+            paths.append(Paths.getUserWordTemplatesFold(textObj.username))
+    return getServerFiles(paths, Paths.wtmExt)
 
 def getUserGUIFiles(textObj=None):
     if textObj is None:
