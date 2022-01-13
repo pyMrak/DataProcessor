@@ -259,7 +259,7 @@ class DataGroup(object):
         self._parameters.setGrpName(folder)
 
     def getFolder(self):
-        return os.path.basename(os.path.split(self.groupDir))#Path(self.groupDir).parent
+        return os.path.split(self.groupDir)[-1]#Path(self.groupDir).parent
 
     def getPath(self):
         return self.groupDir

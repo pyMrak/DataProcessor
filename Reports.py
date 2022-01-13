@@ -238,7 +238,26 @@ class ExcelGraphList(ExcelBlock):
         return self.getOccupied([0, 0], **kwargs)
 
 
-class ExcelReport(object):
+class Report(object):
+
+    def __init__(self):
+        self.lastReport = None
+
+    def openLast(self):
+        if self.lastReport is not None:
+            if type(self.lastReport) == list:
+                for path in self.lastReport:
+                    self.openReport(path)
+            elif type(self.lastReport) == str:
+                self.openReport(self.lastReport)
+
+    def openReport(self, path):
+        os.startfile(path.replace('/', '\\'), 'open')
+
+
+
+
+class ExcelReport(Report):
 
     BLOCKS = {
         "ExcelGraphList": ExcelGraphList,
@@ -246,6 +265,7 @@ class ExcelReport(object):
     }
 
     def __init__(self):
+        Report.__init__(self)
         self.workbook = ExcelWorkbook()
         self.nameRaw = "{}"
         self.maxDataGroups = 0
@@ -282,15 +302,27 @@ class ExcelReport(object):
     def save(self, dataGroups, path=None):
         if len(dataGroups) < self.maxDataGroups:
             return None  # TODO add error
-        fileName = self.nameRaw.format(dataGroups[0].getFolder()) + ".xlsx"
+        fileName = self.nameRaw.format(dataGroups[0].getFolder())
         if path is None:
             print(dataGroups[0].getPath(), fileName)
             path = Paths.join(dataGroups[0].getPath(), fileName)
         else:
             path = Paths.join(path, fileName)
         print("saving")
-        self.workbook.save(path, groups=dataGroups)
-        self.reset()
+        for i in range(100):
+            if i:
+                nr = "({})".format(i)
+            else:
+                nr = ""
+            try:
+                filePath = "{0}{1}.xlsx".format(path, nr)
+                self.workbook.save(filePath, groups=dataGroups)
+                self.reset()
+                self.lastReport = filePath
+                return filePath
+            except PermissionError:
+                self.reset()
+
 
 
 
@@ -324,6 +356,7 @@ if __name__ == "__main__":
 
     #wb.save("test.xlsx", groups=[data])
     er.save([data])
+    er.openLast()
     # eg = ExcelGraph('functionalGP', [2, 3], 0)
     # print(eg.getAnchor(27, 5))
 
