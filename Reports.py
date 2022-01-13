@@ -32,6 +32,10 @@ class ExcelWorkbook(Workbook):
         self.active.addBlock(block)
         return block.dataGroup + 1
 
+    # def reset(self):
+    #     for sheet in self._sheets:
+    #         sheet.reset()
+
     def save(self, filename, *args, **kwargs):
         for worksheet in self.worksheets:
             worksheet.insert(*args, **kwargs)
@@ -52,6 +56,10 @@ class ExcelWorksheet(Worksheet):
         kwargs["occupied"] = [0, 0]
         for block in self.blocks:
             kwargs["occupied"] = block.insert(*args, **kwargs)
+
+    # def reset(self):
+    #     print("title:", self.title)
+    #     Worksheet.__init__(self.parent, self.title)
 
 
 
@@ -244,6 +252,7 @@ class ExcelReport(object):
 
     def readReportSetting(self, settingsFile, GUIobj=None):
         self.maxDataGroups = 0
+        self.settingsFile = settingsFile
         self.settings = Basic.loadUserExcReportFile(settingsFile, GUIobj)
         if "name" in self.settings:
             self.nameRaw = self.settings["name"]
@@ -264,6 +273,12 @@ class ExcelReport(object):
                                 self.maxDataGroups = dataGroup
         return self.maxDataGroups
 
+    def reset(self):
+        self.workbook = ExcelWorkbook()
+        self.nameRaw = "{}"
+        self.maxDataGroups = 0
+        self.readReportSetting(self.settingsFile)
+
     def save(self, dataGroups, path=None):
         if len(dataGroups) < self.maxDataGroups:
             return None  # TODO add error
@@ -275,6 +290,7 @@ class ExcelReport(object):
             path = Paths.join(path, fileName)
         print("saving")
         self.workbook.save(path, groups=dataGroups)
+        self.reset()
 
 
 
