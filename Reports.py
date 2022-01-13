@@ -3,10 +3,16 @@ from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.drawing.image import Image
 
+import os
 
-import Paths
-import Graph
-import Basic
+if os.path.dirname(__file__) == os.getcwd():
+    import Paths
+    import Graph
+    import Basic
+else:
+    from . import Paths
+    from . import Graph
+    from . import  Basic
 
 class ExcelWorkbook(Workbook):
 
@@ -22,8 +28,9 @@ class ExcelWorkbook(Workbook):
     def setSheetTitle(self, title):
         self.active.title = title
 
-    def adBlock(self, block):
+    def addBlock(self, block):
         self.active.addBlock(block)
+        return block.dataGroup + 1
 
     def save(self, filename, *args, **kwargs):
         for worksheet in self.worksheets:
@@ -61,13 +68,14 @@ class ExcelBlock(object):
     goodVal.border = Border(left=bd, top=bd, right=bd, bottom=bd)
     numberFormats = ['0', '0.0', '0.00', '0.000', '0.0000']
 
-    def __init__(self, position=None, direction=0):
+    def __init__(self, position=None, direction=0, dataGroup=0):
         self.direction = direction
         if position is None:
             self.relPosition = [0, 0]
             self.position = [0, 0]
         else:
             self.definePosition(position)
+        self.dataGroup = dataGroup
         #self.worksheet = None
 
     def definePosition(self, position):
@@ -128,8 +136,8 @@ class ExcelPictureList(ExcelBlock):
 class ExcelParameterTable(ExcelBlock):
 
     def __init__(self, settings=None, position=None, direction=0, dataGroup=0):
-        self.dataGroup = dataGroup
-        ExcelBlock.__init__(self, position, direction)
+        #self.dataGroup = dataGroup
+        ExcelBlock.__init__(self, position, direction, dataGroup)
 
     def setDataGroup(self, dg):
         self.dataGroup = dg
@@ -159,17 +167,25 @@ class ExcelParameterTable(ExcelBlock):
                 cell = self.worksheet.cell(row=self.position[1]+2,
                                            column=col)
                 cell.value = entity
+                rounding = parameters.getRounding(entity)
+                goodStyle = self.goodVal.__copy__()
+                goodStyle.name += "_" + entity
+                goodStyle.number_format = self.numberFormats[rounding]
+                badStyle = self.badVal.__copy__()
+                badStyle.name += "_" + entity
+                badStyle.number_format = self.numberFormats[rounding]
                 for j, dPoint in enumerate(parameters[entity]):
                     cell = self.worksheet.cell(row=self.position[1]+j+3,
                                                column=col)
                     cell.value = dPoint.value
-                    if True: # evaluate: TODO
+                    if True:  # evaluate: TODO
                         if parameters[j][i].isValid():
-                            style = self.goodVal.__copy__()
+                            style = goodStyle#self.goodVal.__copy__()
                         else:
-                            style = self.badVal.__copy__()
-                    style.number_format = self.numberFormats[dPoint.rounding]
+                            style = badStyle#self.badVal.__copy__()
+                    #style.number_format = self.numberFormats[dPoint.rounding]
                     cell.style = style
+                    #cell.style.number_format = self.numberFormats[dPoint.rounding]
             return self.getOccupied([col, self.position[1]+j+3], **kwargs)
         return self.getOccupied([0, 0], **kwargs)
 
@@ -179,9 +195,9 @@ class ExcelGraphList(ExcelBlock):
 
     def __init__(self, settings=None, position=None, direction=0, dataGroup=0, listDown=True):
         self.setGraphFile(settings)
-        self.dataGroup = dataGroup
+        #self.dataGroup = dataGroup
         self.listDown = listDown
-        ExcelBlock.__init__(self, position, direction)
+        ExcelBlock.__init__(self, position, direction, dataGroup)
 
     def setGraphFile(self, graphFile):
         self._gw = Graph.GraphWrapper(graphFile)
@@ -224,8 +240,10 @@ class ExcelReport(object):
     def __init__(self):
         self.workbook = ExcelWorkbook()
         self.nameRaw = "{}"
+        self.maxDataGroups = 0
 
     def readReportSetting(self, settingsFile, GUIobj=None):
+        self.maxDataGroups = 0
         self.settings = Basic.loadUserExcReportFile(settingsFile, GUIobj)
         if "name" in self.settings:
             self.nameRaw = self.settings["name"]
@@ -241,14 +259,21 @@ class ExcelReport(object):
                     blocks = sheets[sheetName]["blocks"]
                     for block in blocks:
                         if block in self.BLOCKS:
-                            self.workbook.adBlock(self.BLOCKS[block](**blocks[block]))
+                            dataGroup = self.workbook.addBlock(self.BLOCKS[block](**blocks[block]))
+                            if dataGroup > self.maxDataGroups:
+                                self.maxDataGroups = dataGroup
+        return self.maxDataGroups
 
     def save(self, dataGroups, path=None):
+        if len(dataGroups) < self.maxDataGroups:
+            return None  # TODO add error
         fileName = self.nameRaw.format(dataGroups[0].getFolder()) + ".xlsx"
         if path is None:
+            print(dataGroups[0].getPath(), fileName)
             path = Paths.join(dataGroups[0].getPath(), fileName)
         else:
             path = Paths.join(path, fileName)
+        print("saving")
         self.workbook.save(path, groups=dataGroups)
 
 

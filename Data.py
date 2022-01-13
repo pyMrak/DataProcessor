@@ -126,6 +126,11 @@ class Parameters(object):
         else:
             return False
 
+    def getRounding(self, entity):
+        if entity in self.df:
+            return self.df[entity].iloc[0].rounding
+        return 4
+
     def shape(self):
         return self.df.shape
 
@@ -254,7 +259,7 @@ class DataGroup(object):
         self._parameters.setGrpName(folder)
 
     def getFolder(self):
-        return Path(self.groupDir).parent
+        return os.path.basename(os.path.dirname(self.groupDir))#Path(self.groupDir).parent
 
     def getPath(self):
         return self.groupDir
