@@ -304,11 +304,9 @@ class ExcelReport(Report):
             return None  # TODO add error
         fileName = self.nameRaw.format(dataGroups[0].getFolder())
         if path is None:
-            print(dataGroups[0].getPath(), fileName)
             path = Paths.join(dataGroups[0].getPath(), fileName)
         else:
             path = Paths.join(path, fileName)
-        print("saving")
         for i in range(100):
             if i:
                 nr = "({})".format(i)
